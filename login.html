@@ -10,7 +10,7 @@
         :root {
             --cgc-teal: #55a393;
             --cgc-red: #b5302b;
-            --cgc-dark: #1a1a1a;
+            --cgc-dark: #444444;
             --cgc-light: #efefef;
             --white: #ffffff;
         }
@@ -27,7 +27,8 @@
             overflow: hidden;
         }
 
-        .glow { position: absolute; width: 35vw; height: 35vw; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.08; }
+        /* Ambient brand glow consistent with index.html */
+        .glow { position: absolute; width: 40vw; height: 40vw; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.1; }
         .glow-teal { background: var(--cgc-teal); top: -10%; right: -10%; }
 
         .login-container {
@@ -36,8 +37,9 @@
             padding: 2.5rem;
             text-align: center;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            border-radius: 12px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.03);
+            z-index: 1;
         }
 
         h1 {
@@ -45,13 +47,13 @@
             font-weight: 800;
             font-size: 2.2rem;
             margin-bottom: 0.5rem;
-            color: var(--cgc-dark);
+            color: #1a1a1a;
             letter-spacing: -1px;
         }
 
         .subtitle {
             font-size: 1rem;
-            color: #666;
+            color: var(--cgc-dark);
             margin-bottom: 2.5rem;
         }
 
@@ -74,7 +76,7 @@
             width: 100%;
             padding: 1rem;
             border: 1.5px solid var(--cgc-light);
-            border-radius: 10px;
+            border-radius: 8px;
             font-family: 'Raleway';
             font-size: 1rem;
             background: var(--white);
@@ -89,22 +91,24 @@
 
         .btn-login {
             width: 100%;
-            padding: 1.2rem;
+            padding: 1.1rem;
             background: var(--cgc-teal);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-family: 'Poppins';
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
             transition: 0.3s;
             margin-top: 1rem;
+            text-transform: uppercase;
         }
 
         .btn-login:hover {
+            opacity: 0.9;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(85, 163, 147, 0.2);
+            box-shadow: 0 5px 15px rgba(85, 163, 147, 0.3);
         }
 
         #error-msg {
@@ -113,6 +117,9 @@
             margin-top: 1.2rem;
             font-weight: 500;
             display: none;
+            background: #fff5f5;
+            padding: 10px;
+            border-radius: 6px;
         }
 
         .back-link {
@@ -122,6 +129,8 @@
             color: #888;
             font-size: 0.9rem;
             transition: 0.3s;
+            font-family: 'Poppins';
+            font-weight: 600;
         }
 
         .back-link:hover { color: var(--cgc-red); }
@@ -133,7 +142,7 @@
 
     <div class="login-container">
         <h1>Internal Access</h1>
-        <p class="subtitle">Enter your CGC credentials to continue.</p>
+        <p class="subtitle">Enter your CGC credentials.</p>
 
         <div class="form-group">
             <label>Email Address</label>
@@ -149,39 +158,40 @@
         
         <p id="error-msg"></p>
 
-        <a href="index.html" class="back-link">← Return to Selection</a>
+        <a href="index.html" class="back-link">← BACK TO HOME</a>
     </div>
 
     <script>
-        // Use your updated credentials
+        // 1. Initial configuration
         const SUPABASE_URL = "https://arnxemorjvtzvpvazrqz.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
         
+        // Ensure supabase is loaded from the CDN before creating client
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // We use an Event Listener instead of onclick to prevent "ReferenceError"
-        document.getElementById('loginBtn').addEventListener('click', async () => {
+        // 2. Attach the click event directly to the button ID
+        const loginBtn = document.getElementById('loginBtn');
+        
+        loginBtn.addEventListener('click', async () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorDisplay = document.getElementById('error-msg');
-            const btn = document.getElementById('loginBtn');
 
+            // Reset UI
             errorDisplay.style.display = 'none';
-            btn.innerText = "VERIFYING...";
-            btn.style.opacity = "0.7";
+            loginBtn.innerText = "VERIFYING...";
+            loginBtn.disabled = true;
 
             try {
-                // 1. Sign in
+                // Step 1: Attempt Login
                 const { data: authData, error: authError } = await _supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
 
-                if (authError) {
-                    throw authError;
-                }
+                if (authError) throw authError;
 
-                // 2. Fetch role from profiles table
+                // Step 2: Fetch the user role from the 'profiles' table
                 const { data: profile, error: profileError } = await _supabase
                     .from('profiles')
                     .select('role')
@@ -189,14 +199,10 @@
                     .single();
 
                 if (profileError || !profile) {
-                    errorDisplay.innerText = "User role not assigned. Contact Admin.";
-                    errorDisplay.style.display = 'block';
-                    btn.innerText = "ENTER DASHBOARD";
-                    btn.style.opacity = "1";
-                    return;
+                    throw new Error("Account role not found. Please contact Admin.");
                 }
 
-                // 3. Redirect based on role
+                // Step 3: Redirect based on the assigned role
                 if (profile.role === 'admin') {
                     window.location.href = 'admin-dashboard.html';
                 } else {
@@ -206,8 +212,8 @@
             } catch (err) {
                 errorDisplay.innerText = err.message;
                 errorDisplay.style.display = 'block';
-                btn.innerText = "ENTER DASHBOARD";
-                btn.style.opacity = "1";
+                loginBtn.innerText = "ENTER DASHBOARD";
+                loginBtn.disabled = false;
             }
         });
     </script>
