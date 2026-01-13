@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGC | Executive Search</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cgc-red: #b5302b;
+            --cgc-teal: #55a393;
+            --cgc-orange: #e77431;
+            --cgc-dark: #444444;
+            --cgc-light: #efefef;
+            --white: #ffffff;
+        }
+
+        body {
+            background-color: var(--white);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Raleway', sans-serif;
+            margin: 0;
+            color: var(--cgc-dark);
+        }
+
+        .chat-container {
+            width: 95%;
+            max-width: 900px;
+            height: 85vh;
+            background: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 12px; /* Rounded corners as per CGC elements */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 30px;
+            background: var(--white);
+            border-bottom: 1px solid var(--cgc-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-titles h2 {
+            font-family: 'Poppins';
+            font-weight: 800;
+            margin: 0;
+            font-size: 1.4rem;
+            color: var(--text);
+        }
+
+        .back-btn {
+            text-decoration: none;
+            font-family: 'Poppins';
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--cgc-teal);
+            transition: 0.3s;
+        }
+
+        .back-btn:hover { color: var(--cgc-red); }
+
+        .chat-box {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--white);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* User messages in CGC Teal */
+        .user-msg {
+            align-self: flex-end;
+            background: var(--cgc-teal);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        /* Bot messages in CGC Light Grey */
+        .bot-msg {
+            align-self: flex-start;
+            background: var(--cgc-light);
+            color: var(--cgc-dark);
+            border-bottom-left-radius: 2px;
+        }
+
+        /* Markdown Table Styling - CGC Professional Format */
+        .message table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin: 15px 0; 
+            background: white; 
+        }
+        .message th { 
+            background: var(--cgc-teal); 
+            color: white; 
+            font-family: 'Poppins'; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+        }
+        .message td { 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+        }
+
+        .input-area {
+            padding: 25px 30px;
+            display: flex;
+            gap: 15px;
+            background: var(--white);
+            border-top: 1px solid var(--cgc-light);
+        }
+
+        input {
+            flex: 1;
+            background: var(--cgc-light);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            outline: none;
+            font-family: 'Raleway';
+            font-size: 1rem;
+        }
+
+        button {
+            background: var(--cgc-red);
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-family: 'Poppins';
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="header">
+        <div class="header-titles">
+            <h2>Common Good Company</h2>
+            <small style="color: var(--cgc-teal); font-weight: 600;">Executive Consulting Concierge</small>
+        </div>
+        <a href="index.html" class="back-btn">← BACK TO HOME</a>
+    </div>
+    
+    <div class="chat-box" id="chatBox">
+        <div class="message bot-msg">Welcome. I am the CGC Executive Assistant. How may I assist your search for excellence today?</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Describe your requirement..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button onclick="sendMessage()">SEND</button>
+    </div>
+</div>
+
+<script>
+    // Keeping your logic intact
+    const API_URL = "https://arnxemorjvtzvpvazrqz.supabase.co/functions/v1/smart-action";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
+
+    let chatHistory = [];
+
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const chatBox = document.getElementById('chatBox');
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendMessage(text, 'user-msg');
+        input.value = '';
+
+        const loadingDiv = appendMessage("Accessing Executive Database...", 'bot-msg');
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    message: text,
+                    history: chatHistory,
+                    userRole: 'worker' // Ensuring the Edge Function knows the role
+                })
+            });
+
+            const data = await response.json();
+            const reply = data.reply || "I apologize, I've encountered a connection issue. Please try again.";
+            
+            loadingDiv.innerHTML = marked.parse(reply);
+
+            chatHistory.push({ role: "user", parts: [{ text: text }] });
+            chatHistory.push({ role: "model", parts: [{ text: reply }] });
+            
+        } catch (error) {
+            loadingDiv.innerText = "Connection error. Please ensure the backend function is active.";
+        }
+        
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function appendMessage(text, className) {
+        const chatBox = document.getElementById('chatBox');
+        const div = document.createElement('div');
+        div.className = `message ${className}`;
+        
+        if (className === 'bot-msg') {
+            div.innerHTML = marked.parse(text);
+        } else {
+            div.innerText = text;
+        }
+        
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return div;
+    }
+</script>
+
+</body>
+</html>
