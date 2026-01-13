@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CGC | Worker Access</title>
+    <title>CGC | Internal Access</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
+            [cite_start]/* CGC Official Color Palette [cite: 39-44] */
             --cgc-teal: #55a393;
             --cgc-red: #b5302b;
-            --cgc-dark: #1a1a1a;
+            --cgc-dark: #444444;
             --cgc-light: #efefef;
             --white: #ffffff;
         }
 
         body, html {
             margin: 0; padding: 0; height: 100%;
-            font-family: 'Raleway', sans-serif;
+            font-family: 'Raleway', sans-serif; [cite_start]/* [cite: 56] */
             background-color: var(--white);
             display: flex; align-items: center; justify-content: center;
         }
 
+        [cite_start]/* Minimalist ambient glow [cite: 52] */
         .glow { position: absolute; width: 35vw; height: 35vw; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.08; background: var(--cgc-teal); top: -10%; right: -10%; }
 
         .login-container {
@@ -29,16 +31,17 @@
             background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.03);
         }
 
-        h1 { font-family: 'Poppins'; font-weight: 800; font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--cgc-dark); letter-spacing: -1px; }
-        .subtitle { font-size: 1rem; color: #666; margin-bottom: 2.5rem; }
+        h1 { font-family: 'Poppins'; font-weight: 800; font-size: 2.2rem; margin-bottom: 0.5rem; color: #1a1a1a; letter-spacing: -1px; }
+        .subtitle { font-size: 1rem; color: var(--cgc-dark); margin-bottom: 2.5rem; }
 
         .form-group { text-align: left; margin-bottom: 1.5rem; }
         label { font-family: 'Poppins'; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--cgc-teal); margin-bottom: 0.5rem; display: block; }
 
         input {
             width: 100%; padding: 1rem; border: 1.5px solid var(--cgc-light); border-radius: 10px;
-            font-family: 'Raleway'; font-size: 1rem; box-sizing: border-box;
+            font-family: 'Raleway'; font-size: 1rem; box-sizing: border-box; outline: none;
         }
+        input:focus { border-color: var(--cgc-teal); }
 
         .btn-login {
             width: 100%; padding: 1.2rem; background: var(--cgc-teal); color: white; border: none;
@@ -47,10 +50,10 @@
         }
 
         .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(85, 163, 147, 0.2); }
-        .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        #error-msg { color: var(--cgc-red); font-size: 0.85rem; margin-top: 1.2rem; display: none; }
-        .back-link { display: inline-block; margin-top: 2rem; text-decoration: none; color: #888; font-size: 0.9rem; }
+        #error-msg { color: var(--cgc-red); font-size: 0.85rem; margin-top: 1.2rem; display: none; background: #fff5f5; padding: 10px; border-radius: 8px; }
+        .back-link { display: inline-block; margin-top: 2rem; text-decoration: none; color: #888; font-size: 0.9rem; font-family: 'Poppins'; }
     </style>
 </head>
 <body>
@@ -79,33 +82,24 @@
     </div>
 
     <script>
-        // Use your provided credentials
         const SUPABASE_URL = "https://arnxemorjvtzvpvazrqz.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
         
-        // Initialize client
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Get elements
         const loginBtn = document.getElementById('loginBtn');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
         const errorDisplay = document.getElementById('error-msg');
 
-        // Main Login Logic
         loginBtn.addEventListener('click', async () => {
-            console.log("Login sequence initiated...");
-            
-            const email = emailInput.value;
-            const password = passwordInput.value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            // Reset UI
             errorDisplay.style.display = 'none';
             loginBtn.innerText = "VERIFYING...";
             loginBtn.disabled = true;
 
             try {
-                // 1. Auth Sign In
+                // 1. Authenticate user
                 const { data: authData, error: authError } = await _supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
@@ -113,20 +107,25 @@
 
                 if (authError) throw authError;
 
-                console.log("Auth success, checking role for:", authData.user.id);
-
-                // 2. Role Check from 'profiles' table
+                // 2. Fetch role from profiles table using the authenticated user's ID
                 const { data: profile, error: profileError } = await _supabase
                     .from('profiles')
                     .select('role')
                     .eq('id', authData.user.id)
                     .single();
 
-                if (profileError || !profile) {
-                    throw new Error("Role profile not found. Please contact Administrator.");
+                if (profileError) {
+                    console.error("Profile Fetch Error:", profileError);
+                    alert("Database Error: " + profileError.message);
+                    throw new Error("Could not access user profile.");
                 }
 
-                // 3. Routing
+                if (!profile) {
+                    alert("Account authenticated, but no role assigned. User ID: " + authData.user.id);
+                    throw new Error("Role profile not found.");
+                }
+
+                // 3. Success Redirect based on role
                 if (profile.role === 'admin') {
                     window.location.href = 'admin-dashboard.html';
                 } else {
@@ -134,7 +133,6 @@
                 }
 
             } catch (err) {
-                console.error("Login process failed:", err.message);
                 errorDisplay.innerText = err.message;
                 errorDisplay.style.display = 'block';
                 loginBtn.innerText = "ENTER DASHBOARD";
