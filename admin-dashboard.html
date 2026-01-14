@@ -49,9 +49,9 @@
         input:focus { border-color: var(--cgc-teal); outline: none; }
 
         .table-container { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; background: white; }
+        table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; }
         th { text-align: left; font-family: 'Montserrat'; font-size: 0.65rem; color: white; padding: 1.2rem 1rem; background: var(--cgc-teal); text-transform: uppercase; }
-        td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .chat-sidebar { width: 400px; background: white; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .chat-messages { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
@@ -64,7 +64,13 @@
         .btn-outline { background: transparent; border: 1px solid var(--cgc-teal); color: var(--cgc-teal); }
         .btn-danger { background: white; color: var(--cgc-red); border: 1px solid var(--cgc-red); }
         .btn-danger:hover { background: var(--cgc-red); color: white; }
-        
+
+        /* MODAL STYLES */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); overflow: auto; }
+        .modal-content { background: white; margin: 2% auto; padding: 2rem; width: 95%; border-radius: 4px; }
+        .modal-content table { table-layout: auto; }
+        .modal-content td { white-space: normal; }
+
         #bulk-input { display: none; }
     </style>
 </head>
@@ -80,21 +86,18 @@
             <div class="card">
                 <div class="card-header">
                     Consultant Record Entry
-                    <span style="font-size: 0.6rem; color: #999; font-weight: 400;">God Mode Active (Direct Write)</span>
+                    <span style="font-size: 0.6rem; color: #999; font-weight: 400;">Professional Admin Mode</span>
                 </div>
                 <div class="form-grid" id="consultantForm">
                     <div class="input-group"><label>Full Name</label><input type="text" id="name"></div>
-                    <div class="input-group"><label>Email</label><input type="email" id="contact_email"></div>
-                    <div class="input-group"><label>Phone</label><input type="text" id="contact_phone"></div>
-                    <div class="input-group"><label>Primary Expertise</label><input type="text" id="primary_expertise"></div>
-                    <div class="input-group"><label>Languages</label><input type="text" id="languages"></div>
-                    <div class="input-group"><label>Country of Residence</label><input type="text" id="country_of_residance"></div>
-                    <div class="input-group"><label>Work Experience</label><input type="text" id="country_of_work_experience"></div>
-                    <div class="input-group"><label>Donor Familiarity</label><input type="text" id="donor_familiarity"></div>
-                    <div class="input-group"><label>Daily Rate Range</label><input type="text" id="daily_rate_range"></div>
-                    <div class="input-group"><label>Network Tier</label><select id="network_tier"><option>Tier 1</option><option>Tier 2</option><option>Tier 3</option></select></div>
-                    <div class="input-group"><label>LinkedIn URL</label><input type="text" id="linkedin_url"></div>
-                    <div class="input-group"><label>Internal Notes</label><input type="text" id="internal_notes"></div>
+                    <div class="input-group"><label>Age</label><input type="number" id="age"></div>
+                    <div class="input-group"><label>Experience (Years)</label><input type="text" id="experience"></div>
+                    <div class="input-group"><label>Skills</label><input type="text" id="skills"></div>
+                    <div class="input-group"><label>Specialization</label><input type="text" id="specialization"></div>
+                    <div class="input-group"><label>Geography</label><input type="text" id="geography"></div>
+                    <div class="input-group"><label>Availability</label><input type="text" id="availability"></div>
+                    <div class="input-group"><label>Contact</label><input type="text" id="contact"></div>
+                    <div class="input-group"><label>Partnership</label><input type="text" id="partnership"></div>
                 </div>
                 <div style="margin-top: 2rem; display: flex; gap: 1rem;">
                     <button class="btn btn-primary" onclick="addConsultant()">Commit Record</button>
@@ -104,25 +107,63 @@
             </div>
 
             <div class="card">
-                <div class="card-header">Global Registry</div>
+                <div class="card-header">
+                    Global Registry 
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="sortOrder" onchange="loadConsultants()" style="padding: 0.3rem; font-size: 0.7rem; text-transform: uppercase;">
+                            <option value="name_asc">Alphabetical (A-Z)</option>
+                            <option value="newest">Newest First</option>
+                        </select>
+                        <button class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.6rem;" onclick="openModal()">Maximize View</button>
+                    </div>
+                </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Name</th><th>Expertise</th><th>Rate Range</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Name</th>
+                                <th style="width: 25%;">Specialization</th>
+                                <th style="width: 30%;">Geography</th>
+                                <th style="width: 20%;">Action</th>
+                            </tr>
+                        </thead>
                         <tbody id="tableBody"></tbody>
                     </table>
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <button class="btn btn-outline" style="width: 100%; border-style: dashed;" onclick="openModal()">View All Records</button>
                 </div>
             </div>
         </main>
 
         <aside class="chat-sidebar">
             <div class="chat-messages" id="aiMessages">
-                <div class="msg ai"><b>Authorized.</b> Intel mode active. <br><br>I can now update, add, or delete records directly in the database. Just ask!</div>
+                <div class="msg ai"><b>Authorized.</b> I'm your CGC Admin Assistant. <br><br>How can I assist you with the database today?</div>
             </div>
             <div class="chat-input-area" style="padding: 1.5rem; display: flex; gap: 0.5rem; border-top: 1px solid var(--border);">
                 <input type="text" id="aiInput" placeholder="Command Intelligence..." style="flex:1" onkeypress="if(event.key==='Enter') chatWithAI()">
                 <button class="btn btn-primary" style="width: 45px; height: 45px; padding: 0;" onclick="chatWithAI()">↑</button>
             </div>
         </aside>
+    </div>
+
+    <div id="fullViewModal" class="modal">
+        <div class="modal-content">
+            <div class="card-header">
+                Detailed Intelligence Registry
+                <button class="btn btn-danger" style="padding: 0.4rem 1rem;" onclick="closeModal()">Close Screen</button>
+            </div>
+            <div class="table-container">
+                <table id="modalTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th><th>Age</th><th>Exp.</th><th>Skills</th><th>Specialization</th><th>Geography</th><th>Availability</th><th>Contact</th><th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalTableBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 <script>
@@ -139,34 +180,53 @@
     async function handleLogout() { await _supabase.auth.signOut(); window.location.href = "login.html"; }
 
     async function loadConsultants() {
-        const { data } = await _supabase.from('consultants').select('*').order('name', { ascending: true });
+        const sortVal = document.getElementById('sortOrder').value;
+        let query = _supabase.from('consultants').select('*');
+        
+        if (sortVal === 'name_asc') query = query.order('name', { ascending: true });
+        else query = query.order('id', { ascending: false }); // Assuming 'id' correlates to time since put
+
+        const { data } = await query;
         const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = (data || []).map(c => `
+        const modalTbody = document.getElementById('modalTableBody');
+
+        // Main Dashboard: Preview 5
+        tbody.innerHTML = (data || []).slice(0, 5).map(c => `
             <tr>
                 <td><strong>${c.name}</strong></td>
-                <td>${c.primary_expertise || '-'}</td>
-                <td>${c.daily_rate_range || '-'}</td>
-                <td><button class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.6rem;" onclick="deleteById('${c.consultant_id}', '${c.name}')">Purge</button></td>
+                <td>${c.specialization || '-'}</td>
+                <td>${c.geography || '-'}</td>
+                <td><button class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.6rem;" onclick="deleteById('${c.id}', '${c.name}')">Purge</button></td>
+            </tr>
+        `).join('');
+
+        // Modal View: Full Data
+        modalTbody.innerHTML = (data || []).map(c => `
+            <tr>
+                <td><strong>${c.name}</strong></td>
+                <td>${c.age || '-'}</td>
+                <td>${c.experience || '-'}</td>
+                <td title="${c.skills}">${c.skills || '-'}</td>
+                <td>${c.specialization || '-'}</td>
+                <td>${c.geography || '-'}</td>
+                <td>${c.availability || '-'}</td>
+                <td>${c.contact || '-'}</td>
+                <td><button class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.6rem;" onclick="deleteById('${c.id}', '${c.name}')">Purge</button></td>
             </tr>
         `).join('');
     }
 
-    async function addConsultant() {
-        const fields = ['name', 'contact_email', 'contact_phone', 'primary_expertise', 'languages', 'country_of_residance', 'country_of_work_experience', 'donor_familiarity', 'daily_rate_range', 'network_tier', 'linkedin_url', 'internal_notes'];
-        const entry = {};
-        fields.forEach(f => entry[f] = document.getElementById(f).value);
-
-        const { error } = await _supabase.from('consultants').insert([entry]);
-        if (error) alert(error.message); else { loadConsultants(); fields.forEach(f => document.getElementById(f).value = ""); }
-    }
+    function openModal() { document.getElementById('fullViewModal').style.display = "block"; }
+    function closeModal() { document.getElementById('fullViewModal').style.display = "none"; }
 
     async function deleteById(id, name) {
         if(confirm("Confirm: Permanently delete " + name + "?")) {
-            await _supabase.from('consultants').delete().eq('consultant_id', id);
+            await _supabase.from('consultants').delete().eq('id', id);
             loadConsultants();
         }
     }
 
+    // chatWithAI() remains the same as our last perfect version...
     async function chatWithAI() {
         const input = document.getElementById('aiInput');
         const box = document.getElementById('aiMessages');
@@ -187,53 +247,19 @@
                 body: JSON.stringify({ message: text, history: [], userRole: 'admin' })
             });
             const resData = await response.json();
-            
-            // Clean display: Hide everything starting from the first backtick or curly bracket
             const rawReply = resData.reply || "";
             bubble.innerHTML = rawReply.split(/[`{]/)[0].trim();
 
             const match = rawReply.match(/\{[\s\S]*\}/);
             if (match) {
                 const json = JSON.parse(match[0]);
-                
-                // Refresh on any database action including SQL
                 if (json.action === "UPSERT" || json.action === "DELETE" || json.action === "SQL") {
                     loadConsultants();
-                    bubble.innerHTML += `<br><br><i style="color: var(--cgc-teal); font-size: 0.7rem;">Registry updated successfully.</i>`;
+                    bubble.innerHTML += `<br><br><i style="color: var(--cgc-teal); font-size: 0.7rem;">Registry updated.</i>`;
                 }
             }
-        } catch(e) { 
-            bubble.innerHTML = "Connectivity error."; 
-            console.error(e);
-        }
+        } catch(e) { bubble.innerHTML = "Connectivity error."; }
         box.scrollTop = box.scrollHeight;
-    }
-
-    async function handleBulkImport(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const text = e.target.result;
-            const rows = text.split('\n').filter(row => row.trim() !== "");
-            const headers = rows[0].split(',');
-            const dataRows = rows.slice(1);
-
-            const uploads = dataRows.map(row => {
-                const cols = row.split(',');
-                return {
-                    name: cols[0],
-                    contact_email: cols[1],
-                    primary_expertise: cols[2],
-                    daily_rate_range: cols[3]
-                };
-            }).filter(r => r.name);
-            
-            const { error } = await _supabase.from('consultants').insert(uploads);
-            if (error) alert("Import Error: " + error.message);
-            else { alert("Import Successful"); loadConsultants(); }
-        };
-        reader.readAsText(file);
     }
 </script>
 </body>
