@@ -188,15 +188,15 @@
             });
             const resData = await response.json();
             
-            // Clean display: Show text before any JSON brackets
+            // Clean display: Hide everything starting from the first backtick or curly bracket
             const rawReply = resData.reply || "";
-            bubble.innerHTML = rawReply.split('{')[0].trim();
+            bubble.innerHTML = rawReply.split(/[`{]/)[0].trim();
 
             const match = rawReply.match(/\{[\s\S]*\}/);
             if (match) {
                 const json = JSON.parse(match[0]);
                 
-                // Refresh table if record changed or SQL executed
+                // Refresh on any database action including SQL
                 if (json.action === "UPSERT" || json.action === "DELETE" || json.action === "SQL") {
                     loadConsultants();
                     bubble.innerHTML += `<br><br><i style="color: var(--cgc-teal); font-size: 0.7rem;">Registry updated successfully.</i>`;
