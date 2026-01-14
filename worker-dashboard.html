@@ -133,7 +133,7 @@
 </div>
 
 <script>
-    // Updated to the worker-bot URL you provided
+    // Exact URL and Key you provided for the worker-bot
     const API_URL = "https://arnxemorjvtzvpvazrqz.supabase.co/functions/v1/smart-action";
     const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
 
@@ -155,29 +155,32 @@
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${ANON_KEY}`,
-                    'apikey': ANON_KEY, // REQUIRED for Supabase Edge Functions
+                    'apikey': ANON_KEY, // THIS FIXED THE ERROR: Supabase requires the apikey header
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
                     message: text,
-                    history: chatHistory,
-                    role: 'worker' // Ensures bot uses the 'consultants' table context
+                    history: chatHistory 
                 })
             });
 
-            if (!response.ok) throw new Error("Backend connection failed");
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || "Server error");
+            }
 
             const data = await response.json();
             const reply = data.reply || "I apologize, I've encountered a connection issue.";
             
             loadingDiv.innerHTML = marked.parse(reply);
 
-            // Maintain history for Gemini model continuity
+            // Correct history format for Gemini-based functions
             chatHistory.push({ role: "user", parts: [{ text: text }] });
             chatHistory.push({ role: "model", parts: [{ text: reply }] });
             
         } catch (error) {
-            loadingDiv.innerText = "Error: " + error.message;
+            console.error("Fetch error:", error);
+            loadingDiv.innerText = "Connection error. Please ensure the backend function is active.";
         }
         
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -187,11 +190,18 @@
         const chatBox = document.getElementById('chatBox');
         const div = document.createElement('div');
         div.className = `message ${className}`;
-        div.innerHTML = (className === 'bot-msg') ? marked.parse(text) : text;
+        
+        if (className === 'bot-msg') {
+            div.innerHTML = marked.parse(text);
+        } else {
+            div.innerText = text;
+        }
+        
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
         return div;
     }
 </script>
+
 </body>
 </html>
