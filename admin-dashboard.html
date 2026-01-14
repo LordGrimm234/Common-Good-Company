@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGC Admin | Intel Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --cgc-teal: #55A393; 
+            --cgc-red: #B5302B; 
+            --cgc-dark: #333333; 
+            --bg-gray: #F9F9F9;
+            --border: #EEEEEE;
+        }
+
+        body { 
+            font-family: 'Raleway', sans-serif; 
+            background: var(--bg-gray); 
+            color: var(--cgc-dark); 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        header { 
+            background: white; 
+            padding: 1rem 3rem; 
+            border-bottom: 2px solid var(--cgc-teal); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 100; 
+        }
+
+        .logo { 
+            font-family: 'Montserrat', sans-serif; 
+            font-weight: 800; 
+            font-size: 1.4rem; 
+            color: var(--cgc-dark); 
+            letter-spacing: -1px; 
+        }
+
+        .app-layout { display: flex; flex: 1; overflow: hidden; }
+
+        /* Workspace Scrollable Area */
+        .main-workspace { flex: 1; padding: 2.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2.5rem; }
+
+        /* CGC Card Style */
+        .card { background: white; border-radius: 4px; border: 1px solid var(--border); padding: 2.5rem; }
+        .card-header { 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            color: var(--cgc-teal); 
+            margin-bottom: 2rem; 
+            letter-spacing: 2px; 
+        }
+
+        /* Updated Grid for all 20+ New Attributes */
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .input-group label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.5rem; color: #777; text-transform: uppercase; }
+        
+        input, select, textarea { 
+            width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; 
+            font-family: 'Raleway', sans-serif; font-size: 0.9rem; background: #fff; box-sizing: border-box; 
+        }
+        input:focus { border-color: var(--cgc-teal); outline: none; }
+
+        /* Table Style */
+        .table-container { border: 1px solid var(--border); margin-top: 1rem; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { 
+            text-align: left; font-family: 'Montserrat'; font-size: 0.65rem; 
+            color: white; padding: 1rem; background: var(--cgc-teal); text-transform: uppercase; 
+        }
+        td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; color: #444; }
+
+        /* AI Sidebar */
+        .chat-sidebar { width: 400px; background: #ffffff; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
+        
+        .msg { max-width: 85%; padding: 1rem; border-radius: 4px; font-size: 0.9rem; line-height: 1.6; }
+        .msg.user { align-self: flex-end; background: var(--cgc-teal); color: white; }
+        .msg.ai { align-self: flex-start; background: var(--bg-gray); color: var(--cgc-dark); border: 1px solid var(--border); }
+
+        .chat-input-area { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.8rem; background: white; }
+        .chat-input-area input { flex: 1; border-radius: 4px; padding: 0.8rem 1rem; background: var(--bg-gray); border: 1px solid var(--border); }
+
+        /* Buttons */
+        .btn { padding: 0.8rem 1.8rem; border-radius: 4px; font-family: 'Montserrat'; font-weight: 700; font-size: 0.75rem; cursor: pointer; border: none; transition: 0.2s; text-transform: uppercase; }
+        .btn-primary { background: var(--cgc-teal); color: white; }
+        .btn-primary:hover { background: #448a7b; }
+        .btn-danger { background: white; color: var(--cgc-red); border: 1px solid var(--cgc-red); padding: 0.4rem 0.8rem; font-size: 0.65rem; }
+        .btn-danger:hover { background: var(--cgc-red); color: white; }
+
+        #auth-section { display: flex; align-items: center; justify-content: center; height: 100vh; background: var(--cgc-dark); }
+        #admin-wrapper { display: none; height: 100vh; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+<div id="auth-section">
+    <div class="card" style="width: 360px; text-align: center; border: none;">
+        <div class="logo" style="margin-bottom: 2.5rem; font-size: 1.8rem;">CGC // ADMIN</div>
+        <input type="email" id="email" placeholder="ADMIN EMAIL" style="margin-bottom:1rem">
+        <input type="password" id="password" placeholder="PASSWORD" style="margin-bottom:2rem">
+        <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">Authorize Access</button>
+    </div>
+</div>
+
+<div id="admin-wrapper">
+    <header>
+        <div class="logo">COMMON GOOD COMPANY <span style="font-weight: 400; color: var(--cgc-teal);">// INTEL</span></div>
+        <button class="btn" style="color: #999; border: 1px solid #ddd;" onclick="handleLogout()">LOGOUT</button>
+    </header>
+    
+    <div class="app-layout">
+        <main class="main-workspace">
+            <div class="card">
+                <div class="card-header">Consultant Record Entry</div>
+                <div class="form-grid">
+                    <div class="input-group"><label>Full Name</label><input type="text" id="name"></div>
+                    <div class="input-group"><label>Email</label><input type="email" id="contact_email"></div>
+                    <div class="input-group"><label>Phone</label><input type="text" id="contact_phone"></div>
+                    <div class="input-group"><label>Primary Expertise</label><input type="text" id="primary_expertise"></div>
+                    <div class="input-group"><label>Languages</label><input type="text" id="languages"></div>
+                    <div class="input-group"><label>Country of Residence</label><input type="text" id="country_of_residance"></div>
+                    <div class="input-group"><label>Work Experience (Countries)</label><input type="text" id="country_of_work_experience"></div>
+                    <div class="input-group"><label>Donor Familiarity</label><input type="text" id="donor_familiarity"></div>
+                    <div class="input-group"><label>Daily Rate Range</label><input type="text" id="daily_rate_range"></div>
+                    <div class="input-group"><label>Network Tier</label><select id="network_tier"><option>Tier 1</option><option>Tier 2</option><option>Tier 3</option></select></div>
+                    <div class="input-group"><label>LinkedIn URL</label><input type="text" id="linkedin_url"></div>
+                    <div class="input-group"><label>Internal Notes</label><input type="text" id="internal_notes"></div>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 2rem;" onclick="addConsultant()">Commit Record</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Global Registry</div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Name</th><th>Expertise</th><th>Rate Range</th><th>Tier</th><th>Action</th></tr></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <aside class="chat-sidebar">
+            <div class="chat-messages" id="aiMessages">
+                <div class="msg ai"><b>System Online.</b> Management mode active. I can parse CV details into the form or help you locate and remove records.</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="aiInput" placeholder="Command Intelligence..." onkeypress="if(event.key==='Enter') chatWithAI()">
+                <button class="btn btn-primary" style="width: 45px; height: 45px; padding: 0; display: flex; align-items: center; justify-content: center;" onclick="chatWithAI()">↑</button>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+    // Ensure you use YOUR updated project details here
+    const S_URL = "https://arnxemorjvtzvpvazrqz.supabase.co"; 
+    const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
+    const _supabase = supabase.createClient(S_URL, S_KEY);
+
+    window.onload = async () => { await _supabase.auth.signOut(); };
+
+    async function handleLogin() {
+        const e = document.getElementById('email').value;
+        const p = document.getElementById('password').value;
+        const { error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
+        if (error) alert("Access Denied"); else {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('admin-wrapper').style.display = 'flex';
+            loadConsultants();
+        }
+    }
+
+    function handleLogout() { location.reload(); }
+
+    async function chatWithAI() {
+        const input = document.getElementById('aiInput');
+        const box = document.getElementById('aiMessages');
+        const text = input.value.trim();
+        if(!text) return;
+
+        box.innerHTML += `<div class="msg user">${text}</div>`;
+        input.value = "";
+        const tid = "t-" + Date.now();
+        box.innerHTML += `<div class="msg ai" id="${tid}">Processing Command...</div>`;
+        box.scrollTop = box.scrollHeight;
+
+        const { data: db } = await _supabase.from('consultants').select('consultant_id, name, primary_expertise');
+
+        // Note: Using your smart-action edge function updated for the new attributes
+        try {
+            const response = await fetch(`${S_URL}/functions/v1/smart-action`, {
+                method: 'POST',
+                headers: { 'apikey': S_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, history: [], userRole: 'admin' })
+            });
+            const resData = await response.json();
+            const bubble = document.getElementById(tid);
+            
+            // Logic to handle JSON actions (DELETE/ADD) returned by Gemini
+            const match = resData.reply.match(/\{[\s\S]*\}/);
+            if (match) {
+                const json = JSON.parse(match[0]);
+                if (json.action === "DELETE") {
+                    if(confirm("Permanently remove " + json.name + "?")) {
+                        await _supabase.from('consultants').delete().eq('consultant_id', json.id);
+                        loadConsultants();
+                        bubble.innerHTML = `Record for <b>${json.name}</b> has been purged.`;
+                    }
+                }
+            } else {
+                bubble.innerHTML = resData.reply;
+            }
+        } catch(e) {
+            document.getElementById(tid).innerHTML = "System Interruption. Please retry.";
+        }
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function loadConsultants() {
+        const { data } = await _supabase.from('consultants').select('*');
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = (data || []).map(c => `
+            <tr>
+                <td><strong>${c.name}</strong></td>
+                <td>${c.primary_expertise || '-'}</td>
+                <td>${c.daily_rate_range || '-'}</td>
+                <td>${c.network_tier || '-'}</td>
+                <td><button class="btn btn-danger" onclick="deleteById('${c.consultant_id}', '${c.name}')">Purge</button></td>
+            </tr>
+        `).join('');
+    }
+
+    async function addConsultant() {
+        const fields = ['name', 'contact_email', 'contact_phone', 'primary_expertise', 'languages', 'country_of_residance', 'country_of_work_experience', 'donor_familiarity', 'daily_rate_range', 'network_tier', 'linkedin_url', 'internal_notes'];
+        const entry = {};
+        fields.forEach(f => entry[f] = document.getElementById(f).value);
+
+        const { error } = await _supabase.from('consultants').insert([entry]);
+        if (error) alert(error.message); else {
+            loadConsultants();
+            fields.forEach(f => document.getElementById(f).value = "");
+        }
+    }
+
+    async function deleteById(id, name) {
+        if(confirm("Delete " + name + "?")) {
+            await _supabase.from('consultants').delete().eq('consultant_id', id);
+            loadConsultants();
+        }
+    }
+</script>
+</body>
+</html>
