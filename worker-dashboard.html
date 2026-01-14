@@ -8,32 +8,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --cgc-red: #b5302b;
+            [cite_start]/* Official CGC Color Palette [cite: 41-45] */
             --cgc-teal: #55a393;
-            --cgc-orange: #e77431;
             --cgc-dark: #444444;
             --cgc-light: #efefef;
+            --cgc-red: #b5302b;
             --white: #ffffff;
+            --border-color: #b7b7b7;
         }
 
         body {
-            background-color: var(--white);
+            background-color: var(--cgc-light);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Raleway', sans-serif;
+            font-family: 'Raleway', sans-serif; [cite_start]/* Primary Font [cite: 60] */
             margin: 0;
             color: var(--cgc-dark);
         }
 
         .chat-container {
             width: 95%;
-            max-width: 900px;
+            max-width: 900px; /* Requested 900px layout */
             height: 85vh;
             background: var(--white);
-            border: 1px solid #ddd;
-            border-radius: 12px; /* Rounded corners as per CGC elements */
+            border: 1px solid var(--border-color);
+            border-radius: 12px; [cite_start]/* Rounded corners [cite: 79] */
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
@@ -43,30 +44,31 @@
         .header {
             padding: 20px 30px;
             background: var(--white);
-            border-bottom: 1px solid var(--cgc-light);
+            border-bottom: 2px solid var(--cgc-teal); [cite_start]/* Brand accent [cite: 78] */
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .header-titles h2 {
-            font-family: 'Poppins';
+            font-family: 'Poppins', sans-serif; [cite_start]/* Website font [cite: 60] */
             font-weight: 800;
             margin: 0;
             font-size: 1.4rem;
-            color: var(--text);
+            color: var(--cgc-teal);
+            letter-spacing: 0.5px;
         }
 
         .back-btn {
             text-decoration: none;
-            font-family: 'Poppins';
+            font-family: 'Poppins', sans-serif;
             font-weight: 600;
             font-size: 0.85rem;
-            color: var(--cgc-teal);
+            color: var(--cgc-dark);
             transition: 0.3s;
         }
 
-        .back-btn:hover { color: var(--cgc-red); }
+        .back-btn:hover { color: var(--cgc-teal); }
 
         .chat-box {
             flex: 1;
@@ -75,7 +77,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            background: var(--white);
+            background: #fafafa; [cite_start]/* Minimalist off-white [cite: 7] */
         }
 
         .message {
@@ -86,7 +88,7 @@
             line-height: 1.6;
         }
 
-        /* User messages in CGC Teal */
+        [cite_start]/* User messages in CGC Teal [cite: 47] */
         .user-msg {
             align-self: flex-end;
             background: var(--cgc-teal);
@@ -94,32 +96,25 @@
             border-bottom-right-radius: 2px;
         }
 
-        /* Bot messages in CGC Light Grey */
+        [cite_start]/* Bot messages in CGC White/Border [cite: 221] */
         .bot-msg {
             align-self: flex-start;
-            background: var(--cgc-light);
+            background: var(--white);
+            border: 1px solid var(--border-color);
             color: var(--cgc-dark);
             border-bottom-left-radius: 2px;
         }
 
-        /* Markdown Table Styling - CGC Professional Format */
-        .message table { 
-            border-collapse: collapse; 
-            width: 100%; 
-            margin: 15px 0; 
-            background: white; 
-        }
+        [cite_start]/* Markdown Table Styling [cite: 176] */
+        .message table { border-collapse: collapse; width: 100%; margin: 15px 0; }
         .message th { 
             background: var(--cgc-teal); 
             color: white; 
             font-family: 'Poppins'; 
             padding: 10px; 
-            border: 1px solid #ddd; 
+            text-align: left;
         }
-        .message td { 
-            padding: 10px; 
-            border: 1px solid #ddd; 
-        }
+        .message td { padding: 10px; border-bottom: 1px solid var(--cgc-light); }
 
         .input-area {
             padding: 25px 30px;
@@ -132,27 +127,30 @@
         input {
             flex: 1;
             background: var(--cgc-light);
-            border: none;
+            border: 1px solid transparent;
             padding: 12px 20px;
-            border-radius: 8px;
+            border-radius: 25px;
             outline: none;
-            font-family: 'Raleway';
+            font-family: 'Raleway', sans-serif;
             font-size: 1rem;
+            transition: 0.3s;
         }
 
+        input:focus { border-color: var(--cgc-teal); background: var(--white); }
+
         button {
-            background: var(--cgc-red);
+            background: var(--cgc-teal);
             border: none;
             color: white;
-            padding: 10px 30px;
-            border-radius: 8px;
-            font-family: 'Poppins';
+            padding: 10px 35px;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
         }
 
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:hover { background: var(--cgc-dark); transform: translateY(-1px); }
     </style>
 </head>
 <body>
@@ -161,9 +159,9 @@
     <div class="header">
         <div class="header-titles">
             <h2>Common Good Company</h2>
-            <small style="color: var(--cgc-teal); font-weight: 600;">Executive Consulting Concierge</small>
+            <small style="color: var(--cgc-dark); font-weight: 500; opacity: 0.8;">Executive Consulting Concierge</small>
         </div>
-        <a href="index.html" class="back-btn">← BACK TO HOME</a>
+        <a href="index.html" class="back-btn">← BACK</a>
     </div>
     
     <div class="chat-box" id="chatBox">
@@ -177,7 +175,6 @@
 </div>
 
 <script>
-    // Keeping your logic intact
     const API_URL = "https://arnxemorjvtzvpvazrqz.supabase.co/functions/v1/smart-action";
     const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
 
@@ -199,25 +196,29 @@
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${ANON_KEY}`,
+                    'apikey': ANON_KEY, // Ensure apikey is sent for Supabase
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
                     message: text,
                     history: chatHistory,
-                    userRole: 'worker' // Ensuring the Edge Function knows the role
+                    role: 'worker' // Standardized property name
                 })
             });
 
+            if (!response.ok) throw new Error("Server error");
+
             const data = await response.json();
-            const reply = data.reply || "I apologize, I've encountered a connection issue. Please try again.";
+            const reply = data.reply || "I apologize, I've encountered a connection issue.";
             
             loadingDiv.innerHTML = marked.parse(reply);
 
+            // Update history format for Google Gemini models
             chatHistory.push({ role: "user", parts: [{ text: text }] });
             chatHistory.push({ role: "model", parts: [{ text: reply }] });
             
         } catch (error) {
-            loadingDiv.innerText = "Connection error. Please ensure the backend function is active.";
+            loadingDiv.innerText = "System currently unavailable. Please check backend status.";
         }
         
         chatBox.scrollTop = chatBox.scrollHeight;
