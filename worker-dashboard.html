@@ -3,70 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CGC | Executive Search</title>
+    <title>Common Good Company | Executive Search</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --cgc-teal: #55a393;
-            --cgc-dark: #444444;
-            --cgc-light: #efefef;
-            --cgc-red: #b5302b;
-            --white: #ffffff;
-            --border-color: #ddd;
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+            --text: #ffffff;
         }
 
         body {
-            background-color: var(--white);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Raleway', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            color: var(--cgc-dark);
         }
 
         .chat-container {
             width: 95%;
             max-width: 900px;
             height: 85vh;
-            background: var(--white);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
         .header {
-            padding: 20px 30px;
-            background: var(--white);
-            border-bottom: 1px solid var(--cgc-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            color: var(--text);
         }
-
-        .header-titles h2 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            margin: 0;
-            font-size: 1.4rem;
-            color: var(--cgc-dark);
-        }
-
-        .back-btn {
-            text-decoration: none;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--cgc-teal);
-            transition: 0.3s;
-        }
-
-        .back-btn:hover { color: var(--cgc-red); }
 
         .chat-box {
             flex: 1;
@@ -75,98 +51,89 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            background: var(--white);
         }
 
         .message {
-            max-width: 80%;
+            max-width: 85%;
             padding: 15px 20px;
-            border-radius: 10px;
+            border-radius: 15px;
             font-size: 1rem;
-            line-height: 1.6;
+            line-height: 1.5;
+            color: white;
         }
+
+        .message p { margin: 0 0 10px 0; }
+        .message strong { color: #fff; font-weight: bold; }
+        .message ul { margin: 10px 0; padding-left: 25px; }
+        .message li { margin-bottom: 8px; }
+        .message table { border-collapse: collapse; width: 100%; margin: 10px 0; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .message th, .message td { border: 1px solid var(--border); padding: 8px; text-align: left; }
 
         .user-msg {
             align-self: flex-end;
-            background: var(--cgc-teal);
-            color: white;
+            background: #6a11cb;
             border-bottom-right-radius: 2px;
         }
 
         .bot-msg {
             align-self: flex-start;
-            background: var(--cgc-light);
-            color: var(--cgc-dark);
+            background: var(--glass);
+            border: 1px solid var(--border);
             border-bottom-left-radius: 2px;
         }
 
-        /* Table Styling matches Brand Guidelines Page 41 */
-        .message table { border-collapse: collapse; width: 100%; margin: 15px 0; background: white; }
-        .message th { 
-            background: var(--cgc-teal); 
-            color: white; 
-            font-family: 'Poppins'; 
-            padding: 10px; 
-            border: 1px solid #ddd; 
-        }
-        .message td { padding: 10px; border: 1px solid #ddd; }
-
         .input-area {
-            padding: 25px 30px;
+            padding: 25px;
             display: flex;
             gap: 15px;
-            background: var(--white);
-            border-top: 1px solid var(--cgc-light);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         input {
             flex: 1;
-            background: var(--cgc-light);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 12px 15px;
+            border-radius: 12px;
+            color: white;
             outline: none;
-            font-family: 'Raleway';
             font-size: 1rem;
         }
 
         button {
-            background: var(--cgc-red);
+            background: #2575fc;
             border: none;
             color: white;
-            padding: 10px 30px;
-            border-radius: 8px;
-            font-family: 'Poppins';
-            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 12px;
             cursor: pointer;
+            font-weight: bold;
             transition: 0.3s;
         }
 
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:hover { background: #1a5dbb; }
     </style>
 </head>
 <body>
 
 <div class="chat-container">
     <div class="header">
-        <div class="header-titles">
-            <h2>Common Good Company</h2>
-            <small style="color: var(--cgc-teal); font-weight: 600;">Executive Consulting Concierge</small>
-        </div>
-        <a href="index.html" class="back-btn">← BACK TO HOME</a>
+        <h2 style="margin:0; font-size: 1.5rem;">Common Good Company</h2>
+        <small style="opacity: 0.8;">Executive Consulting Concierge</small>
     </div>
     
     <div class="chat-box" id="chatBox">
-        <div class="message bot-msg">Welcome. I am the CGC Executive Assistant. How may I assist your search for excellence today?</div>
+        <div class="message bot-msg">Welcome. I am the CGC Executive Assistant. How may I assist your business needs today?</div>
     </div>
 
     <div class="input-area">
-        <input type="text" id="userInput" placeholder="Describe your requirement..." onkeypress="if(event.key === 'Enter') sendMessage()">
-        <button onclick="sendMessage()">SEND</button>
+        <input type="text" id="userInput" placeholder="Discuss your requirements..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button onclick="sendMessage()">Send</button>
     </div>
 </div>
 
 <script>
+    // Updated to the worker-bot URL you provided
     const API_URL = "https://arnxemorjvtzvpvazrqz.supabase.co/functions/v1/smart-action";
     const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
 
@@ -181,39 +148,36 @@
         appendMessage(text, 'user-msg');
         input.value = '';
 
-        const loadingDiv = appendMessage("Accessing Executive Database...", 'bot-msg');
+        const loadingDiv = appendMessage("Consulting Executive Database...", 'bot-msg');
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${ANON_KEY}`,
-                    'apikey': ANON_KEY, // CRITICAL FIX for Supabase Functions
+                    'apikey': ANON_KEY, // REQUIRED for Supabase Edge Functions
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
                     message: text,
                     history: chatHistory,
-                    userRole: 'worker'
+                    role: 'worker' // Ensures bot uses the 'consultants' table context
                 })
             });
 
-            if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(errorData);
-            }
+            if (!response.ok) throw new Error("Backend connection failed");
 
             const data = await response.json();
             const reply = data.reply || "I apologize, I've encountered a connection issue.";
             
             loadingDiv.innerHTML = marked.parse(reply);
 
+            // Maintain history for Gemini model continuity
             chatHistory.push({ role: "user", parts: [{ text: text }] });
             chatHistory.push({ role: "model", parts: [{ text: reply }] });
             
         } catch (error) {
-            console.error("Connection Error:", error);
-            loadingDiv.innerText = "Connection error. Ensure the 'worker-bot' function is deployed.";
+            loadingDiv.innerText = "Error: " + error.message;
         }
         
         chatBox.scrollTop = chatBox.scrollHeight;
