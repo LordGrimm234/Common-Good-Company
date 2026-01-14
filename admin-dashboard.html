@@ -7,80 +7,88 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --user-bubble: #007aff; --ai-bubble: #f1f5f9; --bg: #f8fafc; --text: #1e293b; --muted: #64748b; }
+        :root { --primary: #55A393; --user-bubble: #55A393; --ai-bubble: #f1f5f9; --bg: #f8fafc; --text: #1e293b; --muted: #64748b; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -0.8px; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -1px; }
         .app-layout { display: flex; flex: 1; overflow: hidden; }
         .main-workspace { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2rem; }
-        .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        .card-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
-        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        .input-group label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--muted); text-transform: uppercase; }
-        input { width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; background: #fafafa; box-sizing: border-box; }
-        .table-container { border-radius: 12px; border: 1px solid #f1f5f9; overflow-x: auto; margin-top: 1rem; }
-        .table-container.collapsed { max-height: 400px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 2800px; }
+        .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Form Styling */
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .input-group label { display: block; font-size: 0.65rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--muted); text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ddd; font-size: 0.8rem; box-sizing: border-box; }
+
+        .table-container { border-radius: 12px; border: 1px solid #f1f5f9; overflow-x: auto; background: white; }
+        .table-container.collapsed { max-height: 350px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 2500px; }
         th { text-align: left; font-size: 0.7rem; color: var(--muted); padding: 1rem; background: #fafafa; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; }
-        td { padding: 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; white-space: nowrap; }
-        .chat-sidebar { width: 420px; background: white; border-left: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+        td { padding: 0.8rem 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; white-space: nowrap; }
+        
+        .chat-sidebar { width: 400px; background: white; border-left: 1px solid #e2e8f0; display: flex; flex-direction: column; }
         .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
-        .msg { max-width: 85%; padding: 1rem 1.2rem; border-radius: 18px; font-size: 0.88rem; line-height: 1.5; }
-        .msg.user { align-self: flex-end; background: var(--user-bubble); color: white; border-bottom-right-radius: 4px; }
-        .msg.ai { align-self: flex-start; background: var(--ai-bubble); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
-        .chat-input-area { padding: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; gap: 0.8rem; }
-        .chat-input-area input { flex: 1; border-radius: 30px; padding: 0.8rem 1.2rem; background: #f4f4f7; border: none; }
-        .btn { padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s; }
+        .msg { max-width: 85%; padding: 0.8rem 1.1rem; border-radius: 14px; font-size: 0.85rem; line-height: 1.5; }
+        .msg.user { align-self: flex-end; background: var(--user-bubble); color: white; border-bottom-right-radius: 2px; }
+        .msg.ai { align-self: flex-start; background: var(--ai-bubble); border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
+        .chat-input-area { padding: 1.2rem; border-top: 1px solid #e2e8f0; display: flex; gap: 0.8rem; }
+        .chat-input-area input { flex: 1; border-radius: 20px; padding: 0.7rem 1.2rem; background: #f1f5f9; border: none; outline: none; }
+        
+        .btn { padding: 0.7rem 1.4rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-size: 0.75rem; text-transform: uppercase; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); font-size: 0.7rem; padding: 0.5rem 1rem; }
-        .btn-danger { background: #fee2e2; color: #dc2626; font-size: 0.7rem; padding: 0.4rem 0.8rem; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-danger { background: #fee2e2; color: #dc2626; padding: 0.3rem 0.6rem; }
+        
+        #admin-wrapper { display: flex; height: 100vh; flex-direction: column; }
     </style>
 </head>
 <body>
 
-<div id="admin-wrapper" style="display: flex; height: 100vh; flex-direction: column;">
-    <header><div class="logo">CGC // INTEL</div><button class="btn" style="color: var(--muted)" onclick="location.href='login.html'">LOGOUT</button></header>
+<div id="admin-wrapper">
+    <header>
+        <div class="logo">CGC // INTEL</div>
+        <button class="btn" style="color:var(--muted)" onclick="location.href='login.html'">Logout</button>
+    </header>
+    
     <div class="app-layout">
         <main class="main-workspace">
             <div class="card">
                 <div class="card-header">
-                    Data Entry (Full Registry)
-                    <button class="btn btn-outline" onclick="document.getElementById('bulkJson').click()">Bulk Import</button>
-                    <input type="file" id="bulkJson" hidden accept=".json" onchange="handleBulkImport(event)">
+                    Manual Data Entry (23 Attributes)
+                    <div>
+                        <button class="btn btn-outline" style="font-size:0.6rem; padding:0.4rem;" onclick="document.getElementById('bulkJson').click()">Bulk Import</button>
+                        <input type="file" id="bulkJson" hidden accept=".json" onchange="handleBulkImport(event)">
+                    </div>
                 </div>
-                <div class="form-grid">
-                    <div class="input-group"><label>Full Name</label><input type="text" id="name"></div>
-                    <div class="input-group"><label>Email</label><input type="text" id="contact_email"></div>
-                    <div class="input-group"><label>Phone</label><input type="text" id="contact_phone"></div>
-                    <div class="input-group"><label>Expertise</label><input type="text" id="primary_expertise"></div>
-                    <div class="input-group"><label>Languages</label><input type="text" id="languages"></div>
-                    <div class="input-group"><label>Residence</label><input type="text" id="country_of_residence"></div>
-                    <div class="input-group"><label>Work Exp</label><input type="text" id="country_of_work_experience"></div>
-                    <div class="input-group"><label>Service Type</label><input type="text" id="service_type_experience"></div>
-                    <div class="input-group"><label>Sector</label><input type="text" id="sector_experience"></div>
-                    <div class="input-group"><label>Donor Fam.</label><input type="text" id="donor_familiarity"></div>
-                    <div class="input-group"><label>CV URL</label><input type="text" id="cv_url"></div>
-                    <div class="input-group"><label>LinkedIn</label><input type="text" id="linkedin_url"></div>
-                    <div class="input-group"><label>Portfolio</label><input type="text" id="portfolio_or_samples_url"></div>
-                    <div class="input-group"><label>Daily Rate</label><input type="text" id="daily_rate_range"></div>
-                    <div class="input-group"><label>Network Tier</label><input type="text" id="network_tier"></div>
-                    <div class="input-group"><label>Referred By</label><input type="text" id="referred_by_or_vouched_by"></div>
-                    <div class="input-group"><label>Source</label><input type="text" id="profile_source"></div>
-                    <div class="input-group"><label>Submitted By</label><input type="text" id="submitted_by"></div>
-                    <div class="input-group"><label>Validated By</label><input type="text" id="validated_by"></div>
-                    <div class="input-group" style="grid-column: span 3;"><label>Internal Notes</label><input type="text" id="internal_notes"></div>
+                <div class="form-grid" id="entryForm">
+                    <div class="input-group"><label>Full Name</label><input type="text" data-field="name"></div>
+                    <div class="input-group"><label>Email</label><input type="text" data-field="contact_email"></div>
+                    <div class="input-group"><label>Phone</label><input type="text" data-field="contact_phone"></div>
+                    <div class="input-group"><label>Expertise</label><input type="text" data-field="primary_expertise"></div>
+                    <div class="input-group"><label>Languages</label><input type="text" data-field="languages"></div>
+                    <div class="input-group"><label>Residence</label><input type="text" data-field="country_of_residence"></div>
+                    <div class="input-group"><label>Work Exp</label><input type="text" data-field="country_of_work_experience"></div>
+                    <div class="input-group"><label>Service Type</label><input type="text" data-field="service_type_experience"></div>
+                    <div class="input-group"><label>Sector Exp</label><input type="text" data-field="sector_experience"></div>
+                    <div class="input-group"><label>Donor Fam.</label><input type="text" data-field="donor_familiarity"></div>
+                    <div class="input-group"><label>CV URL</label><input type="text" data-field="cv_url"></div>
+                    <div class="input-group"><label>LinkedIn</label><input type="text" data-field="linkedin_url"></div>
+                    <div class="input-group"><label>Daily Rate</label><input type="text" data-field="daily_rate_range"></div>
+                    <div class="input-group"><label>Source</label><input type="text" data-field="profile_source"></div>
+                    <div class="input-group" style="grid-column: span 2;"><label>Internal Notes</label><input type="text" data-field="internal_notes"></div>
                 </div>
-                <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="addConsultant()">Commit Record</button>
+                <button class="btn btn-primary" onclick="addRecord()">Commit Record</button>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    Global Register
-                    <button class="btn btn-outline" id="toggleBtn" onclick="toggleRegistry()">Maximize Full View</button>
+                    Global Registry View
+                    <button class="btn btn-primary" id="viewBtn" style="font-size:0.6rem; padding:0.4rem 0.8rem;" onclick="toggleView()">Maximize View</button>
                 </div>
-                <div class="table-container collapsed" id="tableContainer">
+                <div class="table-container collapsed" id="tableCont">
                     <table>
-                        <thead id="tableHeader"></thead>
+                        <thead id="tableHead"></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
@@ -89,67 +97,77 @@
 
         <aside class="chat-sidebar">
             <div class="chat-messages" id="aiMessages">
-                <div class="msg ai"><b>System Online.</b> Update using natural language or bulk import.</div>
+                <div class="msg ai"><b>CGC Intel Terminal.</b> Ready for commands.</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="aiInput" placeholder="Command..." onkeypress="if(event.key==='Enter') chatWithAI()">
-                <button class="btn btn-primary" style="border-radius: 50%; width: 42px; height: 42px; padding: 0;" onclick="chatWithAI()">↑</button>
+                <button class="btn btn-primary" style="border-radius:50%; width:40px; height:40px; padding:0;" onclick="chatWithAI()">↑</button>
             </div>
         </aside>
     </div>
 </div>
 
 <script>
-    // UPDATED TO YOUR NEW PROJECT URL
     const S_URL = "https://arnxemorjvtzvpvazrqz.supabase.co";
     const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
     const _supabase = supabase.createClient(S_URL, S_KEY);
 
     let isMaximized = false;
-    // Exactly 20 key attributes mapped from your images
-    const fields = ["name", "contact_email", "contact_phone", "primary_expertise", "languages", "country_of_residence", "country_of_work_experience", "service_type_experience", "sector_experience", "donor_familiarity", "cv_url", "linkedin_url", "portfolio_or_samples_url", "daily_rate_range", "network_tier", "referred_by_or_vouched_by", "profile_source", "submitted_by", "validated_by", "internal_notes"];
+    // Map of fields to display
+    const fieldList = ["name", "contact_email", "contact_phone", "primary_expertise", "languages", "country_of_residence", "country_of_work_experience", "service_type_experience", "sector_experience", "donor_familiarity", "cv_url", "linkedin_url", "daily_rate_range", "profile_source", "internal_notes"];
 
     window.onload = loadConsultants;
 
-    function toggleRegistry() {
+    function toggleView() {
         isMaximized = !isMaximized;
-        document.getElementById('tableContainer').classList.toggle('collapsed');
-        document.getElementById('toggleBtn').innerText = isMaximized ? "Show Recent 5" : "Maximize Full View";
+        document.getElementById('tableCont').classList.toggle('collapsed');
+        document.getElementById('viewBtn').innerText = isMaximized ? "Show Recent 5" : "Maximize View";
         loadConsultants();
     }
 
     async function loadConsultants() {
-        // Use your actual timestamp column from screenshot: 'submitted_on'
+        const tbody = document.getElementById('tableBody');
+        const thead = document.getElementById('tableHead');
+        
         let query = _supabase.from('consultants').select('*');
         
+        // Sorting by 'submitted_on' if it exists, otherwise fallback to name
         if (!isMaximized) {
-            query = query.order('submitted_on', { ascending: false }).limit(5);
+            query = query.order('name', { ascending: true }).limit(5);
+        } else {
+            query = query.order('name', { ascending: true });
         }
 
         const { data, error } = await query;
         if (error) {
-            console.error("Fetch error:", error);
-            document.getElementById('tableBody').innerHTML = `<tr><td>Error: ${error.message}. Column names might not match.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10">Sync Error: ${error.message}</td></tr>`;
             return;
         }
 
-        // Generate Headers
-        document.getElementById('tableHeader').innerHTML = `<tr>${fields.map(f => `<th>${f.replace(/_/g, ' ').toUpperCase()}</th>`).join('')}<th>ACTION</th></tr>`;
+        // Set Headers
+        thead.innerHTML = `<tr>${fieldList.map(f => `<th>${f.replace(/_/g, ' ').toUpperCase()}</th>`).join('')}<th>ACTIONS</th></tr>`;
 
-        // Generate Rows
-        document.getElementById('tableBody').innerHTML = (data || []).map(c => `
+        // Set Rows
+        tbody.innerHTML = (data || []).map(c => `
             <tr>
-                ${fields.map(f => `<td>${c[f] || '-'}</td>`).join('')}
-                <td><button class="btn btn-danger" onclick="deleteById('${c.consultant_id}', '${c.name}')">Delete</button></td>
+                ${fieldList.map(f => `<td>${c[f] || '-'}</td>`).join('')}
+                <td><button class="btn btn-danger" onclick="deleteRecord('${c.consultant_id}', '${c.name}')">Delete</button></td>
             </tr>
         `).join('');
     }
 
-    async function addConsultant() {
+    async function addRecord() {
         const entry = {};
-        fields.forEach(f => { entry[f] = document.getElementById(f).value; });
+        document.querySelectorAll('[data-field]').forEach(input => {
+            entry[input.getAttribute('data-field')] = input.value;
+        });
+
         const { error } = await _supabase.from('consultants').insert([entry]);
-        if (error) alert("Error: " + error.message); else { loadConsultants(); clearForm(); }
+        if (error) alert("Error: " + error.message); 
+        else {
+            loadConsultants();
+            document.querySelectorAll('[data-field]').forEach(i => i.value = "");
+        }
     }
 
     async function handleBulkImport(event) {
@@ -160,21 +178,19 @@
                 const json = JSON.parse(e.target.result);
                 const { error } = await _supabase.from('consultants').insert(Array.isArray(json) ? json : [json]);
                 if (error) throw error;
-                alert("Imported Successfully");
+                alert("Import Successful");
                 loadConsultants();
-            } catch (err) { alert("Import failed: " + err.message); }
+            } catch (err) { alert("Failed: " + err.message); }
         };
         reader.readAsText(file);
     }
 
-    async function deleteById(id, name) {
-        if(confirm("Confirm deletion of " + name + "?")) {
-            await _supabase.from('consultants').delete().eq('consultant_id', id);
-            loadConsultants();
+    async function deleteRecord(id, name) {
+        if(confirm(`Confirm: Delete ${name}?`)) {
+            const { error } = await _supabase.from('consultants').delete().eq('consultant_id', id);
+            if(error) alert(error.message); else loadConsultants();
         }
     }
-
-    function clearForm() { fields.forEach(f => { if(document.getElementById(f)) document.getElementById(f).value = ""; }); }
 
     async function chatWithAI() {
         const input = document.getElementById('aiInput');
@@ -189,25 +205,17 @@
         box.scrollTop = box.scrollHeight;
 
         try {
-            // Updated to fetch real data from your NEW project
-            const { data: db } = await _supabase.from('consultants').select('name, country_of_residence, primary_expertise').limit(10);
-            
+            const { data: sessionData } = await _supabase.auth.getSession();
+            const token = sessionData?.session?.access_token;
+
             const response = await fetch(`${S_URL}/functions/v1/chat-with-ai`, {
                 method: 'POST',
-                headers: { 
-                    'apikey': S_KEY,
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify({ message: `Current Consultants: ${JSON.stringify(db)}. Command: ${text}`, history: [] })
+                headers: { 'apikey': S_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, history: [], userRole: 'admin' })
             });
-            
-            if (!response.ok) throw new Error("CORS or Function Error");
-            
             const resData = await response.json();
             document.getElementById(tid).innerHTML = resData.reply;
-        } catch(e) {
-            document.getElementById(tid).innerHTML = "<b>Edge Function Error:</b> The chat-with-ai function is likely from your old project or missing CORS headers for github.io.";
-        }
+        } catch(e) { document.getElementById(tid).innerHTML = "System Error: Check CORS settings."; }
         box.scrollTop = box.scrollHeight;
     }
 </script>
