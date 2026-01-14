@@ -16,14 +16,14 @@
         .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
         .card-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Form Styling */
+        /* 23 Attribute Grid */
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
         .input-group label { display: block; font-size: 0.65rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--muted); text-transform: uppercase; }
         .input-group input { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ddd; font-size: 0.8rem; box-sizing: border-box; }
 
         .table-container { border-radius: 12px; border: 1px solid #f1f5f9; overflow-x: auto; background: white; }
         .table-container.collapsed { max-height: 350px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 2500px; }
+        table { width: 100%; border-collapse: collapse; min-width: 3000px; } /* Wide for 23 attrs */
         th { text-align: left; font-size: 0.7rem; color: var(--muted); padding: 1rem; background: #fafafa; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; }
         td { padding: 0.8rem 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; white-space: nowrap; }
         
@@ -55,28 +55,31 @@
         <main class="main-workspace">
             <div class="card">
                 <div class="card-header">
-                    Manual Data Entry (23 Attributes)
-                    <div>
-                        <button class="btn btn-outline" style="font-size:0.6rem; padding:0.4rem;" onclick="document.getElementById('bulkJson').click()">Bulk Import</button>
-                        <input type="file" id="bulkJson" hidden accept=".json" onchange="handleBulkImport(event)">
-                    </div>
+                    Registry Input (23 Attributes)
+                    <button class="btn btn-outline" style="font-size:0.6rem; padding:0.4rem;" onclick="document.getElementById('bulkJson').click()">Bulk JSON</button>
+                    <input type="file" id="bulkJson" hidden accept=".json" onchange="handleBulkImport(event)">
                 </div>
                 <div class="form-grid" id="entryForm">
-                    <div class="input-group"><label>Full Name</label><input type="text" data-field="name"></div>
+                    <div class="input-group"><label>Name</label><input type="text" data-field="name"></div>
                     <div class="input-group"><label>Email</label><input type="text" data-field="contact_email"></div>
                     <div class="input-group"><label>Phone</label><input type="text" data-field="contact_phone"></div>
                     <div class="input-group"><label>Expertise</label><input type="text" data-field="primary_expertise"></div>
                     <div class="input-group"><label>Languages</label><input type="text" data-field="languages"></div>
                     <div class="input-group"><label>Residence</label><input type="text" data-field="country_of_residence"></div>
                     <div class="input-group"><label>Work Exp</label><input type="text" data-field="country_of_work_experience"></div>
-                    <div class="input-group"><label>Service Type</label><input type="text" data-field="service_type_experience"></div>
+                    <div class="input-group"><label>Service Exp</label><input type="text" data-field="service_type_experience"></div>
                     <div class="input-group"><label>Sector Exp</label><input type="text" data-field="sector_experience"></div>
                     <div class="input-group"><label>Donor Fam.</label><input type="text" data-field="donor_familiarity"></div>
+                    <div class="input-group"><label>Daily Rate</label><input type="text" data-field="daily_rate_range"></div>
+                    <div class="input-group"><label>Network Tier</label><input type="text" data-field="network_tier"></div>
+                    <div class="input-group"><label>Vouched By</label><input type="text" data-field="referred_by_or_vouched_by"></div>
+                    <div class="input-group"><label>Source</label><input type="text" data-field="profile_source"></div>
+                    <div class="input-group"><label>Validated By</label><input type="text" data-field="validated_by"></div>
+                    <div class="input-group"><label>Submitted By</label><input type="text" data-field="submitted_by"></div>
                     <div class="input-group"><label>CV URL</label><input type="text" data-field="cv_url"></div>
                     <div class="input-group"><label>LinkedIn</label><input type="text" data-field="linkedin_url"></div>
-                    <div class="input-group"><label>Daily Rate</label><input type="text" data-field="daily_rate_range"></div>
-                    <div class="input-group"><label>Source</label><input type="text" data-field="profile_source"></div>
-                    <div class="input-group" style="grid-column: span 2;"><label>Internal Notes</label><input type="text" data-field="internal_notes"></div>
+                    <div class="input-group"><label>Portfolio</label><input type="text" data-field="portfolio_or_samples_url"></div>
+                    <div class="input-group" style="grid-column: span 3;"><label>Internal Notes</label><input type="text" data-field="internal_notes"></div>
                 </div>
                 <button class="btn btn-primary" onclick="addRecord()">Commit Record</button>
             </div>
@@ -84,7 +87,7 @@
             <div class="card">
                 <div class="card-header">
                     Global Registry View
-                    <button class="btn btn-primary" id="viewBtn" style="font-size:0.6rem; padding:0.4rem 0.8rem;" onclick="toggleView()">Maximize View</button>
+                    <button class="btn btn-primary" id="viewBtn" style="font-size:0.6rem; padding:0.4rem 0.8rem;" onclick="toggleView()">Maximize Table</button>
                 </div>
                 <div class="table-container collapsed" id="tableCont">
                     <table>
@@ -97,7 +100,7 @@
 
         <aside class="chat-sidebar">
             <div class="chat-messages" id="aiMessages">
-                <div class="msg ai"><b>CGC Intel Terminal.</b> Ready for commands.</div>
+                <div class="msg ai"><b>CGC Intel Terminal.</b> Connected to <code>smart-action</code>.</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="aiInput" placeholder="Command..." onkeypress="if(event.key==='Enter') chatWithAI()">
@@ -113,15 +116,15 @@
     const _supabase = supabase.createClient(S_URL, S_KEY);
 
     let isMaximized = false;
-    // Map of fields to display
-    const fieldList = ["name", "contact_email", "contact_phone", "primary_expertise", "languages", "country_of_residence", "country_of_work_experience", "service_type_experience", "sector_experience", "donor_familiarity", "cv_url", "linkedin_url", "daily_rate_range", "profile_source", "internal_notes"];
+    // Map of all major fields (adjust names to match your exact DB columns)
+    const fieldList = ["name", "primary_expertise", "contact_email", "contact_phone", "country_of_residence", "country_of_work_experience", "daily_rate_range", "service_type_experience", "sector_experience", "donor_familiarity", "network_tier", "profile_source", "cv_url", "internal_notes"];
 
     window.onload = loadConsultants;
 
     function toggleView() {
         isMaximized = !isMaximized;
         document.getElementById('tableCont').classList.toggle('collapsed');
-        document.getElementById('viewBtn').innerText = isMaximized ? "Show Recent 5" : "Maximize View";
+        document.getElementById('viewBtn').innerText = isMaximized ? "Show Recent 5" : "Maximize Table";
         loadConsultants();
     }
 
@@ -131,23 +134,19 @@
         
         let query = _supabase.from('consultants').select('*');
         
-        // Sorting by 'submitted_on' if it exists, otherwise fallback to name
+        // Sorting by Name or ID for now (adjust 'submitted_on' if you have it)
         if (!isMaximized) {
-            query = query.order('name', { ascending: true }).limit(5);
-        } else {
-            query = query.order('name', { ascending: true });
+            query = query.limit(5);
         }
 
         const { data, error } = await query;
         if (error) {
-            tbody.innerHTML = `<tr><td colspan="10">Sync Error: ${error.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td>Sync Error: ${error.message}</td></tr>`;
             return;
         }
 
-        // Set Headers
         thead.innerHTML = `<tr>${fieldList.map(f => `<th>${f.replace(/_/g, ' ').toUpperCase()}</th>`).join('')}<th>ACTIONS</th></tr>`;
 
-        // Set Rows
         tbody.innerHTML = (data || []).map(c => `
             <tr>
                 ${fieldList.map(f => `<td>${c[f] || '-'}</td>`).join('')}
@@ -159,15 +158,12 @@
     async function addRecord() {
         const entry = {};
         document.querySelectorAll('[data-field]').forEach(input => {
-            entry[input.getAttribute('data-field')] = input.value;
+            if(input.value) entry[input.getAttribute('data-field')] = input.value;
         });
 
         const { error } = await _supabase.from('consultants').insert([entry]);
         if (error) alert("Error: " + error.message); 
-        else {
-            loadConsultants();
-            document.querySelectorAll('[data-field]').forEach(i => i.value = "");
-        }
+        else { loadConsultants(); clearInputs(); }
     }
 
     async function handleBulkImport(event) {
@@ -186,10 +182,14 @@
     }
 
     async function deleteRecord(id, name) {
-        if(confirm(`Confirm: Delete ${name}?`)) {
+        if(confirm(`Delete ${name}?`)) {
             const { error } = await _supabase.from('consultants').delete().eq('consultant_id', id);
             if(error) alert(error.message); else loadConsultants();
         }
+    }
+
+    function clearInputs() {
+        document.querySelectorAll('[data-field]').forEach(i => i.value = "");
     }
 
     async function chatWithAI() {
@@ -205,17 +205,24 @@
         box.scrollTop = box.scrollHeight;
 
         try {
-            const { data: sessionData } = await _supabase.auth.getSession();
-            const token = sessionData?.session?.access_token;
+            const { data: { session } } = await _supabase.auth.getSession();
+            const token = session?.access_token;
 
-            const response = await fetch(`${S_URL}/functions/v1/chat-with-ai`, {
+            // UPDATED ENDPOINT TO /smart-action
+            const response = await fetch(`${S_URL}/functions/v1/smart-action`, {
                 method: 'POST',
-                headers: { 'apikey': S_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, history: [], userRole: 'admin' })
+                headers: { 
+                    'apikey': S_KEY, 
+                    'Authorization': `Bearer ${token}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ message: text })
             });
             const resData = await response.json();
-            document.getElementById(tid).innerHTML = resData.reply;
-        } catch(e) { document.getElementById(tid).innerHTML = "System Error: Check CORS settings."; }
+            document.getElementById(tid).innerHTML = resData.reply || "Action processed.";
+        } catch(e) { 
+            document.getElementById(tid).innerHTML = "<b>System Error:</b> Check Edge Function URL and CORS headers."; 
+        }
         box.scrollTop = box.scrollHeight;
     }
 </script>
