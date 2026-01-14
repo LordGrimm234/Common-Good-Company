@@ -3,45 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Common Good Company | Executive Search</title>
+    <title>CGC | Worker Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.2);
-            --text: #ffffff;
+            --cgc-green: #55a393; /* Green for user bubbles and links */
+            --cgc-red: #b5302b;   /* Red for send button */
+            --bot-bg: #f2f2f2;    /* Light gray for bot messages */
+            --page-bg: #e0e0e0;   /* Light gray background to make the white box stand out */
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-color: var(--page-bg); /* Background that makes the white card stand out */
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Raleway', sans-serif;
             margin: 0;
         }
 
+        /* The Centered White Rectangular Box */
         .chat-container {
             width: 95%;
             max-width: 900px;
             height: 85vh;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background-color: #ffffff; /* Solid White */
             display: flex;
             flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Makes it stand out distinctively */
+            border: 1px solid #d1d1d1;
+            padding: 0;
             overflow: hidden;
         }
 
+        /* Header (Inside the white box) */
         .header {
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid var(--border);
-            text-align: center;
-            color: var(--text);
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background-color: #ffffff;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .header-titles h2 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+        .header-titles small {
+            color: var(--cgc-green);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Back to Home Button (Top Right, inside box) */
+        .back-home {
+            color: var(--cgc-green);
+            text-decoration: none;
+            font-family: 'Poppins';
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding-top: 5px;
         }
 
         .chat-box {
@@ -51,89 +80,94 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            background-color: #ffffff;
         }
 
+        /* Message Bubbles */
         .message {
-            max-width: 85%;
+            max-width: 70%;
             padding: 15px 20px;
-            border-radius: 15px;
+            border-radius: 4px; /* Rectangular shape */
             font-size: 1rem;
             line-height: 1.5;
+        }
+
+        /* User text: Green background, white text */
+        .user-msg {
+            align-self: flex-end;
+            background-color: var(--cgc-green);
             color: white;
         }
 
-        .message p { margin: 0 0 10px 0; }
-        .message strong { color: #fff; font-weight: bold; }
-        .message ul { margin: 10px 0; padding-left: 25px; }
-        .message li { margin-bottom: 8px; }
-        .message table { border-collapse: collapse; width: 100%; margin: 10px 0; background: rgba(0,0,0,0.2); border-radius: 8px; }
-        .message th, .message td { border: 1px solid var(--border); padding: 8px; text-align: left; }
-
-        .user-msg {
-            align-self: flex-end;
-            background: #6a11cb;
-            border-bottom-right-radius: 2px;
-        }
-
+        /* Chatbot text: Light gray background, dark text (standard for white-UI bots) */
         .bot-msg {
             align-self: flex-start;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-bottom-left-radius: 2px;
+            background-color: var(--bot-bg);
+            color: #333333;
         }
 
+        /* Input Area (Bottom of white box) */
         .input-area {
-            padding: 25px;
+            padding: 20px 30px;
             display: flex;
             gap: 15px;
-            background: rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+            border-top: 1px solid #eeeeee;
         }
 
         input {
             flex: 1;
-            background: transparent;
-            border: 1px solid var(--border);
-            padding: 12px 15px;
-            border-radius: 12px;
-            color: white;
+            background-color: #f9f9f9;
+            border: 1px solid #dddddd;
+            padding: 15px;
+            border-radius: 4px;
             outline: none;
+            font-family: 'Raleway';
             font-size: 1rem;
         }
 
-        button {
-            background: #2575fc;
-            border: none;
+        /* Red Send Button */
+        .send-btn {
+            background-color: var(--cgc-red);
             color: white;
-            padding: 10px 25px;
-            border-radius: 12px;
+            border: none;
+            padding: 0 35px;
+            border-radius: 4px;
+            font-family: 'Poppins';
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
+            text-transform: uppercase;
         }
 
-        button:hover { background: #1a5dbb; }
+        .send-btn:hover { opacity: 0.9; }
+
+        /* Scrollbar styling */
+        .chat-box::-webkit-scrollbar { width: 6px; }
+        .chat-box::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="chat-container">
     <div class="header">
-        <h2 style="margin:0; font-size: 1.5rem;">Common Good Company</h2>
-        <small style="opacity: 0.8;">Executive Consulting Concierge</small>
+        <div class="header-titles">
+            <h2>Common Good Company</h2>
+            <small>Executive Consulting Concierge</small>
+        </div>
+        <a href="index.html" class="back-home">BACK TO HOME</a>
     </div>
-    
+
     <div class="chat-box" id="chatBox">
-        <div class="message bot-msg">Welcome. I am the CGC Executive Assistant. How may I assist your business needs today?</div>
+        <div class="message bot-msg">Welcome. I am the CGC Executive Assistant. How may I assist your search for excellence today?</div>
     </div>
 
     <div class="input-area">
-        <input type="text" id="userInput" placeholder="Discuss your requirements..." onkeypress="if(event.key === 'Enter') sendMessage()">
-        <button onclick="sendMessage()">Send</button>
+        <input type="text" id="userInput" placeholder="Describe your requirement..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button class="send-btn" onclick="sendMessage()">SEND</button>
     </div>
 </div>
 
 <script>
-    // Exact URL and Key you provided for the worker-bot
     const API_URL = "https://arnxemorjvtzvpvazrqz.supabase.co/functions/v1/smart-action";
     const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
 
@@ -141,62 +175,49 @@
 
     async function sendMessage() {
         const input = document.getElementById('userInput');
-        const chatBox = document.getElementById('chatBox');
         const text = input.value.trim();
         if (!text) return;
 
         appendMessage(text, 'user-msg');
         input.value = '';
 
-        const loadingDiv = appendMessage("Consulting Executive Database...", 'bot-msg');
+        const loadingDiv = appendMessage("Accessing database...", 'bot-msg');
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${ANON_KEY}`,
-                    'apikey': ANON_KEY, // THIS FIXED THE ERROR: Supabase requires the apikey header
+                    'apikey': ANON_KEY,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
                     message: text,
-                    history: chatHistory 
+                    history: chatHistory,
+                    userRole: 'worker'
                 })
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || "Server error");
-            }
-
             const data = await response.json();
-            const reply = data.reply || "I apologize, I've encountered a connection issue.";
+            const reply = data.reply || "No response from Gemini 3.";
             
             loadingDiv.innerHTML = marked.parse(reply);
 
-            // Correct history format for Gemini-based functions
             chatHistory.push({ role: "user", parts: [{ text: text }] });
             chatHistory.push({ role: "model", parts: [{ text: reply }] });
             
         } catch (error) {
-            console.error("Fetch error:", error);
-            loadingDiv.innerText = "Connection error. Please ensure the backend function is active.";
+            loadingDiv.innerText = "Error: " + error.message;
         }
         
-        chatBox.scrollTop = chatBox.scrollHeight;
+        document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
     }
 
     function appendMessage(text, className) {
         const chatBox = document.getElementById('chatBox');
         const div = document.createElement('div');
         div.className = `message ${className}`;
-        
-        if (className === 'bot-msg') {
-            div.innerHTML = marked.parse(text);
-        } else {
-            div.innerText = text;
-        }
-        
+        div.innerHTML = (className === 'bot-msg') ? marked.parse(text) : text;
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
         return div;
