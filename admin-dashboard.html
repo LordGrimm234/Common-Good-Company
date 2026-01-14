@@ -7,142 +7,171 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #55A393; --user-bubble: #55A393; --ai-bubble: #f1f5f9; --bg: #f8fafc; --text: #1e293b; --muted: #64748b; }
+        :root { --primary: #2563eb; --user-bubble: #007aff; --ai-bubble: #f1f5f9; --bg: #f8fafc; --text: #1e293b; --muted: #64748b; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { background: white; padding: 1rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -1px; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -0.8px; }
         .app-layout { display: flex; flex: 1; overflow: hidden; }
         .main-workspace { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2rem; }
         .card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        .card-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+        .card-header { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center;}
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        .input-group label { display: block; font-size: 0.65rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--muted); text-transform: uppercase; }
-        input { width: 100%; padding: 0.7rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; background: #fafafa; box-sizing: border-box; }
+        .input-group label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--muted); text-transform: uppercase; }
+        input { width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; background: #fafafa; box-sizing: border-box; }
         .table-container { border-radius: 12px; border: 1px solid #f1f5f9; overflow-x: auto; margin-top: 1rem; }
-        .table-container.collapsed { max-height: 400px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 1200px; }
+        .table-container.collapsed { max-height: 450px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 2500px; }
         th { text-align: left; font-size: 0.7rem; color: var(--muted); padding: 1rem; background: #fafafa; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; }
-        td { padding: 0.8rem 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; }
+        td { padding: 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
         .chat-sidebar { width: 420px; background: white; border-left: 1px solid #e2e8f0; display: flex; flex-direction: column; }
         .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
-        .msg { max-width: 85%; padding: 1rem; border-radius: 18px; font-size: 0.88rem; line-height: 1.5; }
+        .msg { max-width: 85%; padding: 1rem 1.2rem; border-radius: 18px; font-size: 0.88rem; line-height: 1.5; }
         .msg.user { align-self: flex-end; background: var(--user-bubble); color: white; border-bottom-right-radius: 4px; }
         .msg.ai { align-self: flex-start; background: var(--ai-bubble); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
-        .btn { padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s; font-size: 0.75rem; }
+        .chat-input-area { padding: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; gap: 0.8rem; }
+        .chat-input-area input { flex: 1; border-radius: 30px; padding: 0.8rem 1.2rem; background: #f4f4f7; border: none; }
+        .btn { padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-danger { background: #fee2e2; color: #dc2626; font-size: 0.7rem; padding: 0.4rem 0.8rem; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); font-size: 0.7rem; padding: 0.5rem 1rem; }
+        .btn-danger { background: #fee2e2; color: #dc2626; font-size: 0.75rem; padding: 0.4rem 0.8rem; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">CGC // INTEL</div>
-    <div style="display: flex; gap: 10px;">
-        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem;" onclick="location.href='login.html'">Switch Account</button>
-    </div>
-</header>
-
-<div class="app-layout">
-    <main class="main-workspace">
-        <div class="card">
-            <div class="card-header">
-                Manual Registry Input
-                <button class="btn btn-outline" style="padding: 0.4rem 0.8rem;" onclick="document.getElementById('bulkJson').click()">Bulk JSON</button>
-                <input type="file" id="bulkJson" hidden accept=".json" onchange="handleBulkImport(event)">
-            </div>
-            <div class="form-grid">
-                <div class="input-group"><label>Name</label><input type="text" id="Name"></div>
-                <div class="input-group"><label>Age</label><input type="number" id="Age"></div>
-                <div class="input-group"><label>Experience</label><input type="text" id="Experience"></div>
-                <div class="input-group"><label>Skills</label><input type="text" id="Skills"></div>
-                <div class="input-group"><label>Specialization</label><input type="text" id="Specialization"></div>
-                <div class="input-group"><label>Geography</label><input type="text" id="Geography"></div>
-                <div class="input-group"><label>Availability</label><input type="text" id="Availability"></div>
-                <div class="input-group"><label>Contact</label><input type="text" id="Contact"></div>
-                <div class="input-group"><label>Partnership</label><input type="text" id="Partnership"></div>
+<div id="admin-wrapper" style="display: flex; height: 100vh; flex-direction: column;">
+    <header><div class="logo">CGC // INTEL</div><button class="btn" style="color: var(--muted)" onclick="location.href='login.html'">LOGOUT</button></header>
+    <div class="app-layout">
+        <main class="main-workspace">
+            <div class="card">
+                <div class="card-header">
+                    Data Entry (23 Attributes)
+                    <button class="btn btn-outline" onclick="document.getElementById('bulkInput').click()">Bulk Import JSON</button>
+                    <input type="file" id="bulkInput" hidden accept=".json" onchange="handleBulkImport(event)">
                 </div>
-            <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="addConsultant()">Commit Record</button>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                Global Register
-                <button class="btn btn-outline" id="toggleView" onclick="toggleRegistryView()">Maximize View</button>
+                <div class="form-grid" id="consultantForm">
+                    <div class="input-group"><label>Name</label><input type="text" id="name"></div>
+                    <div class="input-group"><label>Email</label><input type="email" id="contact_email"></div>
+                    <div class="input-group"><label>Phone</label><input type="text" id="contact_phone"></div>
+                    <div class="input-group"><label>Primary Expertise</label><input type="text" id="primary_expertise"></div>
+                    <div class="input-group"><label>Languages</label><input type="text" id="languages"></div>
+                    <div class="input-group"><label>Residence</label><input type="text" id="country_of_residence"></div>
+                    <div class="input-group"><label>Work Experience</label><input type="text" id="country_of_work_experience"></div>
+                    <div class="input-group"><label>Service Exp</label><input type="text" id="service_type_experience"></div>
+                    <div class="input-group"><label>Sector Exp</label><input type="text" id="sector_experience"></div>
+                    <div class="input-group"><label>Donor Familiarity</label><input type="text" id="donor_familiarity"></div>
+                    <div class="input-group"><label>CV URL</label><input type="text" id="cv_url"></div>
+                    <div class="input-group"><label>LinkedIn</label><input type="text" id="linkedin_url"></div>
+                    <div class="input-group"><label>Portfolio</label><input type="text" id="portfolio_or_samples_url"></div>
+                    <div class="input-group"><label>Daily Rate</label><input type="text" id="daily_rate_range"></div>
+                    <div class="input-group"><label>Network Tier</label><input type="text" id="network_tier"></div>
+                    <div class="input-group"><label>Referred By</label><input type="text" id="referred_by_or_vouched_by"></div>
+                    <div class="input-group"><label>Source</label><input type="text" id="profile_source"></div>
+                    <div class="input-group"><label>Submitted By</label><input type="text" id="submitted_by"></div>
+                    <div class="input-group"><label>Validated By</label><input type="text" id="validated_by"></div>
+                    <div class="input-group" style="grid-column: span 3;"><label>Internal Notes</label><input type="text" id="internal_notes"></div>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="addConsultant()">Commit Record</button>
             </div>
-            <div class="table-container collapsed" id="registryContainer">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th><th>Skills</th><th>Geography</th><th>Specialization</th><th>Experience</th><th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </main>
 
-    <aside class="chat-sidebar">
-        <div class="chat-messages" id="aiMessages">
-            <div class="msg ai"><b>CGC Intel Terminal.</b> Use natural language to manage the registry.</div>
-        </div>
-        <div class="chat-input-area">
-            <input type="text" id="aiInput" placeholder="Add Yohan from Dubai..." onkeypress="if(event.key==='Enter') chatWithAI()">
-            <button class="btn btn-primary" style="border-radius: 50%; width: 42px; height: 42px; padding: 0;" onclick="chatWithAI()">↑</button>
-        </div>
-    </aside>
+            <div class="card">
+                <div class="card-header">
+                    Global Registry
+                    <button class="btn btn-outline" id="viewToggle" onclick="toggleView()">Maximize Table</button>
+                </div>
+                <div class="table-container collapsed" id="tableContainer">
+                    <table>
+                        <thead>
+                            <tr id="tableHeader"></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        <aside class="chat-sidebar">
+            <div class="chat-messages" id="aiMessages">
+                <div class="msg ai"><b>System Online.</b> Dashboard synced with Supabase schema.</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="aiInput" placeholder="Command..." onkeypress="if(event.key==='Enter') chatWithAI()">
+                <button class="btn btn-primary" style="border-radius: 50%; width: 42px; height: 42px; padding: 0;" onclick="chatWithAI()">↑</button>
+            </div>
+        </aside>
+    </div>
 </div>
 
 <script>
-    // UPDATED URL FROM YOUR ERROR LOG
     const S_URL = "https://arnxemorjvtzvpvazrqz.supabase.co";
-    const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y"; // Replace with your actual Anon Key
+    const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
     const _supabase = supabase.createClient(S_URL, S_KEY);
 
     let isMaximized = false;
-    // Attributes matching your request exactly
-    const attrList = ["Name", "Age", "Experience", "Skills", "Specialization", "Geography", "Availability", "Contact", "Partnership"];
+    const fields = [
+        "name", "contact_email", "contact_phone", "primary_expertise", "languages", 
+        "country_of_residence", "country_of_work_experience", "service_type_experience", 
+        "sector_experience", "donor_familiarity", "cv_url", "linkedin_url", 
+        "portfolio_or_samples_url", "daily_rate_range", "network_tier", 
+        "referred_by_or_vouched_by", "profile_source", "submitted_by", "validated_by", "internal_notes"
+    ];
 
-    window.onload = loadConsultants;
+    window.onload = () => { loadConsultants(); };
+
+    function toggleView() {
+        isMaximized = !isMaximized;
+        document.getElementById('tableContainer').classList.toggle('collapsed');
+        document.getElementById('viewToggle').innerText = isMaximized ? "Show Recent 5" : "Maximize Table";
+        loadConsultants();
+    }
 
     async function loadConsultants() {
-        // We removed .order('created_at') to avoid the 400 error if that column doesn't exist
-        let query = _supabase.from('consultants').select('*');
+        let query = _supabase.from('consultants').select('*').order('submitted_on', { ascending: false });
         if (!isMaximized) query = query.limit(5);
-
+        
         const { data, error } = await query;
-        if (error) {
-            console.error("Registry Error:", error);
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="6">Error loading data. Check RLS or Column names.</td></tr>`;
-            return;
-        }
+        if (error) return console.error(error);
 
-        document.getElementById('tableBody').innerHTML = (data || []).map(c => `
+        const header = document.getElementById('tableHeader');
+        header.innerHTML = fields.map(f => `<th>${f.replace(/_/g, ' ')}</th>`).join('') + `<th>Action</th>`;
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = (data || []).map(c => `
             <tr>
-                <td><strong>${c.Name || '-'}</strong></td>
-                <td>${c.Skills || '-'}</td>
-                <td>${c.Geography || '-'}</td>
-                <td>${c.Specialization || '-'}</td>
-                <td>${c.Experience || '-'}</td>
-                <td><button class="btn btn-danger" onclick="deleteById('${c.id || c.consultant_id}', '${c.Name}')">Delete</button></td>
+                ${fields.map(f => `<td>${c[f] || '-'}</td>`).join('')}
+                <td><button class="btn btn-danger" onclick="deleteById('${c.consultant_id}', '${c.name}')">Delete</button></td>
             </tr>
         `).join('');
     }
 
-    function toggleRegistryView() {
-        isMaximized = !isMaximized;
-        document.getElementById('toggleView').innerText = isMaximized ? "Minimize View" : "Maximize View";
-        document.getElementById('registryContainer').classList.toggle('collapsed');
-        loadConsultants();
-    }
-
     async function addConsultant() {
         const entry = {};
-        attrList.forEach(id => { entry[id] = document.getElementById(id).value; });
+        fields.forEach(f => { entry[f] = document.getElementById(f).value; });
         const { error } = await _supabase.from('consultants').insert([entry]);
         if (error) alert(error.message); else { loadConsultants(); clearForm(); }
     }
+
+    async function handleBulkImport(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const json = JSON.parse(e.target.result);
+                const { error } = await _supabase.from('consultants').insert(Array.isArray(json) ? json : [json]);
+                if (error) throw error;
+                alert("Import Successful");
+                loadConsultants();
+            } catch (err) { alert("Import Failed: " + err.message); }
+        };
+        reader.readAsText(file);
+    }
+
+    async function deleteById(id, name) {
+        if(confirm("Delete " + name + "?")) {
+            await _supabase.from('consultants').delete().eq('consultant_id', id);
+            loadConsultants();
+        }
+    }
+
+    function clearForm() { fields.forEach(f => document.getElementById(f).value = ""); }
 
     async function chatWithAI() {
         const input = document.getElementById('aiInput');
@@ -156,47 +185,21 @@
         box.innerHTML += `<div class="msg ai" id="${tid}">...</div>`;
         box.scrollTop = box.scrollHeight;
 
+        const { data: sessionData } = await _supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+        const { data: db } = await _supabase.from('consultants').select('consultant_id, name, country_of_residence');
+
         try {
-            // Fetch current DB for AI context
-            const { data: db } = await _supabase.from('consultants').select('Name, Geography, Specialization');
-            
             const response = await fetch(`${S_URL}/functions/v1/chat-with-ai`, {
                 method: 'POST',
-                headers: { 'apikey': S_KEY, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: `DB State: ${JSON.stringify(db)}. User Command: ${text}. If adding, return JSON with keys: Name, Age, Experience, Skills, Specialization, Geography, Availability, Contact, Partnership.`, 
-                    history: [] 
-                })
+                headers: { 'apikey': S_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `DB: ${JSON.stringify(db)}. User: ${text}`, history: [] })
             });
-            
             const resData = await response.json();
-            const bubble = document.getElementById(tid);
-            
-            // Handle AI actions
-            const match = resData.reply.match(/\{[\s\S]*\}/);
-            if (match) {
-                const json = JSON.parse(match[0]);
-                if (json.action === "ADD") {
-                    attrList.forEach(key => { if(json.data[key]) document.getElementById(key).value = json.data[key]; });
-                    bubble.innerHTML = "I've filled the form with that data. Review and click Commit.";
-                }
-            } else {
-                bubble.innerHTML = resData.reply;
-            }
-        } catch(e) {
-            document.getElementById(tid).innerHTML = "Chat offline. Check Edge Function CORS settings.";
-        }
+            document.getElementById(tid).innerHTML = resData.reply;
+        } catch(e) { document.getElementById(tid).innerHTML = "System Error."; }
         box.scrollTop = box.scrollHeight;
     }
-
-    async function deleteById(id, name) {
-        if(confirm("Delete " + name + "?")) {
-            await _supabase.from('consultants').delete().match({ Name: name }); // Safe fallback if ID is messy
-            loadConsultants();
-        }
-    }
-
-    function clearForm() { attrList.forEach(id => document.getElementById(id).value = ""); }
 </script>
 </body>
 </html>
