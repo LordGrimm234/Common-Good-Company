@@ -15,13 +15,12 @@
             --border: #EEEEEE;
         }
 
-        /* Standard Aesthetic: Hidden until session verified */
         body { 
             font-family: 'Raleway', sans-serif; 
             background: var(--bg-gray); 
             color: var(--cgc-dark); 
             margin: 0; 
-            display: none; /* The page stays blank for a split second while checking login */
+            display: none; 
             flex-direction: column; 
             height: 100vh; 
         }
@@ -40,22 +39,20 @@
         .app-layout { display: flex; flex: 1; overflow: hidden; }
         .main-workspace { flex: 1; padding: 2.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2.5rem; }
 
-        /* CGC Minimalist Cards */
-        .card { background: white; border-radius: 4px; border: 1px solid var(--border); padding: 2.5rem; }
-        .card-header { font-family: 'Montserrat'; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--cgc-teal); margin-bottom: 2rem; letter-spacing: 2px; }
+        .card { background: white; border-radius: 4px; border: 1px solid var(--border); padding: 2.5rem; position: relative; }
+        .card-header { font-family: 'Montserrat'; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--cgc-teal); margin-bottom: 2rem; letter-spacing: 2px; display: flex; justify-content: space-between; align-items: center; }
 
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
         .input-group label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.5rem; color: #777; text-transform: uppercase; }
         
-        input, select { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; font-family: 'Raleway'; font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; font-family: 'Raleway'; font-size: 0.9rem; }
+        input:focus { border-color: var(--cgc-teal); outline: none; }
 
-        /* Global Registry Table */
         .table-container { border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; background: white; }
         th { text-align: left; font-family: 'Montserrat'; font-size: 0.65rem; color: white; padding: 1.2rem 1rem; background: var(--cgc-teal); text-transform: uppercase; }
         td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
 
-        /* AI Sidebar */
         .chat-sidebar { width: 400px; background: white; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .chat-messages { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
         .msg { max-width: 85%; padding: 1rem; border-radius: 4px; font-size: 0.9rem; line-height: 1.6; }
@@ -64,8 +61,11 @@
 
         .btn { padding: 0.8rem 1.8rem; border-radius: 4px; font-family: 'Montserrat'; font-weight: 700; cursor: pointer; border: none; text-transform: uppercase; font-size: 0.75rem; transition: 0.2s; }
         .btn-primary { background: var(--cgc-teal); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--cgc-teal); color: var(--cgc-teal); }
         .btn-danger { background: white; color: var(--cgc-red); border: 1px solid var(--cgc-red); }
         .btn-danger:hover { background: var(--cgc-red); color: white; }
+        
+        #bulk-input { display: none; }
     </style>
 </head>
 <body>
@@ -78,8 +78,11 @@
     <div class="app-layout">
         <main class="main-workspace">
             <div class="card">
-                <div class="card-header">Consultant Record Entry</div>
-                <div class="form-grid">
+                <div class="card-header">
+                    Consultant Record Entry
+                    <span style="font-size: 0.6rem; color: #999; font-weight: 400;">God Mode Active (Direct Write)</span>
+                </div>
+                <div class="form-grid" id="consultantForm">
                     <div class="input-group"><label>Full Name</label><input type="text" id="name"></div>
                     <div class="input-group"><label>Email</label><input type="email" id="contact_email"></div>
                     <div class="input-group"><label>Phone</label><input type="text" id="contact_phone"></div>
@@ -93,7 +96,11 @@
                     <div class="input-group"><label>LinkedIn URL</label><input type="text" id="linkedin_url"></div>
                     <div class="input-group"><label>Internal Notes</label><input type="text" id="internal_notes"></div>
                 </div>
-                <button class="btn btn-primary" style="margin-top: 2rem;" onclick="addConsultant()">Commit Record</button>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="addConsultant()">Commit Record</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('bulk-input').click()">Bulk CSV Import</button>
+                    <input type="file" id="bulk-input" accept=".csv" onchange="handleBulkImport(event)">
+                </div>
             </div>
 
             <div class="card">
@@ -109,7 +116,7 @@
 
         <aside class="chat-sidebar">
             <div class="chat-messages" id="aiMessages">
-                <div class="msg ai"><b>System Online.</b> Management mode active. I can help you search, parse CVs, or purge records using intelligence commands.</div>
+                <div class="msg ai"><b>Authorized.</b> Intel mode active. <br><br>I can now update, add, or delete records directly in the database. Just ask!</div>
             </div>
             <div class="chat-input-area" style="padding: 1.5rem; display: flex; gap: 0.5rem; border-top: 1px solid var(--border);">
                 <input type="text" id="aiInput" placeholder="Command Intelligence..." style="flex:1" onkeypress="if(event.key==='Enter') chatWithAI()">
@@ -123,24 +130,16 @@
     const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
     const _supabase = supabase.createClient(S_URL, S_KEY);
 
-    // SILENT AUTH CHECK
     window.onload = async () => {
         const { data: { session } } = await _supabase.auth.getSession();
-        if (!session) {
-            window.location.href = "login.html"; // No login box here, just kick back to login page
-        } else {
-            document.body.style.display = "flex"; // Show dashboard only if authorized
-            loadConsultants();
-        }
+        if (!session) window.location.href = "login.html";
+        else { document.body.style.display = "flex"; loadConsultants(); }
     };
 
-    async function handleLogout() {
-        await _supabase.auth.signOut();
-        window.location.href = "login.html";
-    }
+    async function handleLogout() { await _supabase.auth.signOut(); window.location.href = "login.html"; }
 
     async function loadConsultants() {
-        const { data } = await _supabase.from('consultants').select('*');
+        const { data } = await _supabase.from('consultants').select('*').order('name', { ascending: true });
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = (data || []).map(c => `
             <tr>
@@ -158,10 +157,7 @@
         fields.forEach(f => entry[f] = document.getElementById(f).value);
 
         const { error } = await _supabase.from('consultants').insert([entry]);
-        if (error) alert(error.message); else {
-            loadConsultants();
-            fields.forEach(f => document.getElementById(f).value = "");
-        }
+        if (error) alert(error.message); else { loadConsultants(); fields.forEach(f => document.getElementById(f).value = ""); }
     }
 
     async function deleteById(id, name) {
@@ -182,6 +178,7 @@
         const tid = "t-" + Date.now();
         box.innerHTML += `<div class="msg ai" id="${tid}">Processing...</div>`;
         box.scrollTop = box.scrollHeight;
+        const bubble = document.getElementById(tid);
 
         try {
             const response = await fetch(`${S_URL}/functions/v1/smart-action`, {
@@ -190,24 +187,52 @@
                 body: JSON.stringify({ message: text, history: [], userRole: 'admin' })
             });
             const resData = await response.json();
-            const bubble = document.getElementById(tid);
             
-            // Check for AI-requested actions (Delete/Add)
+            // Display verbal response
+            bubble.innerHTML = resData.reply;
+
             const match = resData.reply.match(/\{[\s\S]*\}/);
             if (match) {
                 const json = JSON.parse(match[0]);
-                if (json.action === "DELETE") {
-                    if(confirm("AI suggested removal of: " + json.name + ". Purge record?")) {
-                        await _supabase.from('consultants').delete().eq('consultant_id', json.id);
-                        loadConsultants();
-                        bubble.innerHTML = `Purged: ${json.name}.`;
-                    }
+                
+                // If AI executed a command, refresh the table
+                if (json.action === "UPSERT" || json.action === "DELETE") {
+                    loadConsultants();
+                    bubble.innerHTML += `<br><br><i style="color: var(--cgc-teal); font-size: 0.7rem;">Database updated successfully.</i>`;
                 }
-            } else {
-                bubble.innerHTML = resData.reply;
             }
-        } catch(e) { bubble.innerHTML = "Connectivity error."; }
+        } catch(e) { 
+            bubble.innerHTML = "Connectivity error."; 
+            console.error(e);
+        }
         box.scrollTop = box.scrollHeight;
+    }
+
+    async function handleBulkImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const text = e.target.result;
+            const rows = text.split('\n').filter(row => row.trim() !== "");
+            const headers = rows[0].split(',');
+            const dataRows = rows.slice(1);
+
+            const uploads = dataRows.map(row => {
+                const cols = row.split(',');
+                return {
+                    name: cols[0],
+                    contact_email: cols[1],
+                    primary_expertise: cols[2],
+                    daily_rate_range: cols[3]
+                };
+            }).filter(r => r.name);
+            
+            const { error } = await _supabase.from('consultants').insert(uploads);
+            if (error) alert("Import Error: " + error.message);
+            else { alert("Import Successful"); loadConsultants(); }
+        };
+        reader.readAsText(file);
     }
 </script>
 </body>
