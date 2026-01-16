@@ -278,22 +278,28 @@
 
     // HELPER TO EXECUTE AI DECISIONS
     async function processAIAction(obj, tid) {
-        if (obj.action === "DRAFT") {
-            document.getElementById(tid).innerHTML = `Writing <b>${obj.data.name}</b> to database...`;
-            const { error } = await _supabase.from('consultants').insert([obj.data]);
-            if (!error) {
-                document.getElementById(tid).innerHTML = `✅ Added <b>${obj.data.name}</b> to the registry via AI command.`;
-                loadData(false);
-            } else {
-                document.getElementById(tid).innerHTML = `❌ Error adding record: ${error.message}`;
-            }
-        } else if (obj.action === "DELETE") {
-             if(confirm(`AI wants to delete ${obj.name}. Proceed?`)) {
-                 deleteRecord(obj.id, obj.name);
-                 document.getElementById(tid).innerHTML = `Record ${obj.name} removed.`;
-             }
+    if (obj.action === "DRAFT") {
+        document.getElementById(tid).innerHTML = `Syncing info for <b>${obj.data.name}</b>...`;
+        
+        // .upsert() checks for an existing record. 
+        // 'onConflict' tells it to look at the 'name' column for duplicates.
+        const { error } = await _supabase
+            .from('consultants')
+            .upsert([obj.data], { onConflict: 'name' }); 
+
+        if (!error) {
+            document.getElementById(tid).innerHTML = `✅ Database synchronized for <b>${obj.data.name}</b>.`;
+            loadData(false);
+        } else {
+            document.getElementById(tid).innerHTML = `❌ Sync Error: ${error.message}`;
         }
+    } else if (obj.action === "DELETE") {
+         if(confirm(`AI suggests deleting ${obj.name}. Proceed?`)) {
+             deleteRecord(obj.id, obj.name);
+             document.getElementById(tid).innerHTML = `Record ${obj.name} removed.`;
+         }
     }
+}
 
     function handleLogout() {
         _supabase.auth.signOut();
