@@ -157,8 +157,6 @@
         const bodyId = isFull ? 'fullBody' : 'recentBody';
         
         let query = _supabase.from('consultants').select('*');
-        
-        // Use 'submitted_on' if available, otherwise fallback to name
         query = query.order('name', { ascending: true });
         
         if (!isFull) query = query.limit(5);
@@ -166,10 +164,8 @@
         const { data, error } = await query;
         if (error) return alert("Sync Error: " + error.message);
 
-        // Render Header
         document.getElementById(headId).innerHTML = `<tr>${allFields.map(f => `<th>${f.replace(/_/g, ' ').toUpperCase()}</th>`).join('')}<th>ACTION</th></tr>`;
         
-        // Render Rows
         document.getElementById(bodyId).innerHTML = (data || []).map(c => `
             <tr>
                 ${allFields.map(f => `<td>${c[f] || '-'}</td>`).join('')}
@@ -250,15 +246,53 @@
                     'Authorization': `Bearer ${session?.access_token}`, 
                     'Content-Type': 'application/json' 
                 },
-                body: JSON.stringify({ message: text })
+                // UPDATED: Added userRole and structure
+                body: JSON.stringify({ 
+                    message: text,
+                    userRole: 'admin',
+                    history: []
+                })
             });
             const resData = await response.json();
-            document.getElementById(tid).innerHTML = resData.reply || "Command executed.";
-            loadData(false); // Auto-refresh data in case AI changed something
+            const reply = resData.reply || "";
+
+            // Check if AI returned a JSON Action
+            if (reply.includes('{"action"')) {
+                try {
+                    const start = reply.indexOf('{');
+                    const end = reply.lastIndexOf('}') + 1;
+                    const actionData = JSON.parse(reply.substring(start, end));
+                    processAIAction(actionData, tid);
+                } catch (e) {
+                    document.getElementById(tid).innerHTML = reply;
+                }
+            } else {
+                document.getElementById(tid).innerHTML = reply;
+            }
+            
         } catch(e) { 
             document.getElementById(tid).innerHTML = "<b>Connection Error:</b> Edge Function unreachable."; 
         }
         box.scrollTop = box.scrollHeight;
+    }
+
+    // HELPER TO EXECUTE AI DECISIONS
+    async function processAIAction(obj, tid) {
+        if (obj.action === "DRAFT") {
+            document.getElementById(tid).innerHTML = `Writing <b>${obj.data.name}</b> to database...`;
+            const { error } = await _supabase.from('consultants').insert([obj.data]);
+            if (!error) {
+                document.getElementById(tid).innerHTML = `✅ Added <b>${obj.data.name}</b> to the registry via AI command.`;
+                loadData(false);
+            } else {
+                document.getElementById(tid).innerHTML = `❌ Error adding record: ${error.message}`;
+            }
+        } else if (obj.action === "DELETE") {
+             if(confirm(`AI wants to delete ${obj.name}. Proceed?`)) {
+                 deleteRecord(obj.id, obj.name);
+                 document.getElementById(tid).innerHTML = `Record ${obj.name} removed.`;
+             }
+        }
     }
 
     function handleLogout() {
