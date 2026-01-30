@@ -146,7 +146,7 @@
     const _supabase = supabase.createClient(S_URL, S_KEY);
 
     // EXACT DB ATTRIBUTE LIST - MATCHED TO YOUR PROVIDED SCHEMA
-    const allFields = ["name", "contact_email", "contact_phone", "primary_expertise", "country_of_residance", "country_of_work_experience", "service_type_experience", "sector_experience", "donor_familiarity", "languages", "daily_rate_range", "network_tier", "referred_by_or_vouched_by", "profile_source", "submitted_by", "submitted_on", "validated_by", "validated_on", "cv_url", "linkedin_url", "portfolio_or_samples_url", "internal_notes"];
+    const allFields = ["consultant_id", "name", "contact_email", "contact_phone", "primary_expertise", "country_of_residance", "country_of_work_experience", "service_type_experience", "sector_experience", "donor_familiarity", "languages", "daily_rate_range", "network_tier", "referred_by_or_vouched_by", "profile_source", "submitted_by", "submitted_on", "validated_by", "validated_on", "cv_url", "linkedin_url", "portfolio_or_samples_url", "internal_notes"];
 
     window.onload = () => loadData(false);
 
@@ -278,7 +278,7 @@
             document.getElementById(tid).innerHTML = `Syncing info for <b>${obj.data.name}</b>...`;
             const { error } = await _supabase
                 .from('consultants')
-                .upsert([obj.data], { onConflict: 'name' }); 
+                .upsert([obj.data], { onConflict: 'consultant_id' }); 
 
             if (!error) {
                 document.getElementById(tid).innerHTML = `✅ Database synchronized for <b>${obj.data.name}</b>.`;
