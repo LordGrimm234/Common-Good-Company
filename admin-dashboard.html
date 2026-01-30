@@ -91,7 +91,7 @@
                     <div class="input-group"><label>Email</label><input type="email" data-field="contact_email"></div>
                     <div class="input-group"><label>Phone</label><input type="text" data-field="contact_phone"></div>
                     <div class="input-group"><label>Expertise</label><input type="text" data-field="primary_expertise"></div>
-                    <div class="input-group"><label>Residence</label><input type="text" data-field="country_of_residence"></div>
+                    <div class="input-group"><label>Residence</label><input type="text" data-field="country_of_residance"></div>
                     <div class="input-group"><label>Work Experience</label><input type="text" data-field="country_of_work_experience"></div>
                     <div class="input-group"><label>Service Type</label><input type="text" data-field="service_type_experience"></div>
                     <div class="input-group"><label>Sector Exp</label><input type="text" data-field="sector_experience"></div>
@@ -104,11 +104,10 @@
                     <div class="input-group"><label>Submitted By</label><input type="text" data-field="submitted_by"></div>
                     <div class="input-group"><label>Submitted On</label><input type="date" data-field="submitted_on"></div>
                     <div class="input-group"><label>Validated By</label><input type="text" data-field="validated_by"></div>
-                    <div class="input-group"><label>Validation Date</label><input type="date" data-field="validation_date"></div>
+                    <div class="input-group"><label>Validation Date</label><input type="date" data-field="validated_on"></div>
                     <div class="input-group"><label>CV URL</label><input type="text" data-field="cv_url"></div>
                     <div class="input-group"><label>LinkedIn URL</label><input type="text" data-field="linkedin_url"></div>
                     <div class="input-group"><label>Portfolio URL</label><input type="text" data-field="portfolio_or_samples_url"></div>
-                    <div class="input-group"><label>Availability</label><input type="text" data-field="availability"></div>
                     <div class="input-group" style="grid-column: span 2;"><label>Internal Notes</label><input type="text" data-field="internal_notes"></div>
                 </div>
                 <button class="btn btn-primary" style="width:100%" onclick="addRecord()">Commit Record to Database</button>
@@ -146,8 +145,8 @@
     const S_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnhlbW9yanZ0enZwdmF6cnF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMjU5NDAsImV4cCI6MjA4MzkwMTk0MH0.l3EaWWOT38sMSCOEbFe9AAOovIEjCy4oQB0cfr21f4Y";
     const _supabase = supabase.createClient(S_URL, S_KEY);
 
-    // EXACT DB ATTRIBUTE LIST
-    const allFields = ["name", "contact_email", "contact_phone", "primary_expertise", "country_of_residence", "country_of_work_experience", "service_type_experience", "sector_experience", "donor_familiarity", "languages", "daily_rate_range", "network_tier", "referred_by_or_vouched_by", "profile_source", "submitted_by", "submitted_on", "validated_by", "validation_date", "cv_url", "linkedin_url", "portfolio_or_samples_url", "availability", "internal_notes"];
+    // EXACT DB ATTRIBUTE LIST - MATCHED TO YOUR PROVIDED SCHEMA
+    const allFields = ["name", "contact_email", "contact_phone", "primary_expertise", "country_of_residance", "country_of_work_experience", "service_type_experience", "sector_experience", "donor_familiarity", "languages", "daily_rate_range", "network_tier", "referred_by_or_vouched_by", "profile_source", "submitted_by", "submitted_on", "validated_by", "validated_on", "cv_url", "linkedin_url", "portfolio_or_samples_url", "internal_notes"];
 
     window.onload = () => loadData(false);
 
@@ -246,7 +245,6 @@
                     'Authorization': `Bearer ${session?.access_token}`, 
                     'Content-Type': 'application/json' 
                 },
-                // UPDATED: Added userRole and structure
                 body: JSON.stringify({ 
                     message: text,
                     userRole: 'admin',
@@ -256,7 +254,6 @@
             const resData = await response.json();
             const reply = resData.reply || "";
 
-            // Check if AI returned a JSON Action
             if (reply.includes('{"action"')) {
                 try {
                     const start = reply.indexOf('{');
@@ -276,30 +273,26 @@
         box.scrollTop = box.scrollHeight;
     }
 
-    // HELPER TO EXECUTE AI DECISIONS
     async function processAIAction(obj, tid) {
-    if (obj.action === "DRAFT") {
-        document.getElementById(tid).innerHTML = `Syncing info for <b>${obj.data.name}</b>...`;
-        
-        // .upsert() checks for an existing record. 
-        // 'onConflict' tells it to look at the 'name' column for duplicates.
-        const { error } = await _supabase
-            .from('consultants')
-            .upsert([obj.data], { onConflict: 'name' }); 
+        if (obj.action === "DRAFT") {
+            document.getElementById(tid).innerHTML = `Syncing info for <b>${obj.data.name}</b>...`;
+            const { error } = await _supabase
+                .from('consultants')
+                .upsert([obj.data], { onConflict: 'name' }); 
 
-        if (!error) {
-            document.getElementById(tid).innerHTML = `✅ Database synchronized for <b>${obj.data.name}</b>.`;
-            loadData(false);
-        } else {
-            document.getElementById(tid).innerHTML = `❌ Sync Error: ${error.message}`;
+            if (!error) {
+                document.getElementById(tid).innerHTML = `✅ Database synchronized for <b>${obj.data.name}</b>.`;
+                loadData(false);
+            } else {
+                document.getElementById(tid).innerHTML = `❌ Sync Error: ${error.message}`;
+            }
+        } else if (obj.action === "DELETE") {
+             if(confirm(`AI suggests deleting ${obj.name}. Proceed?`)) {
+                 deleteRecord(obj.id, obj.name);
+                 document.getElementById(tid).innerHTML = `Record ${obj.name} removed.`;
+             }
         }
-    } else if (obj.action === "DELETE") {
-         if(confirm(`AI suggests deleting ${obj.name}. Proceed?`)) {
-             deleteRecord(obj.id, obj.name);
-             document.getElementById(tid).innerHTML = `Record ${obj.name} removed.`;
-         }
     }
-}
 
     function handleLogout() {
         _supabase.auth.signOut();
