@@ -201,19 +201,44 @@
 
     // BULK IMPORT
     async function handleBulkImport(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                const json = JSON.parse(e.target.result);
-                const { error } = await _supabase.from('consultants').insert(Array.isArray(json) ? json : [json]);
-                if (error) throw error;
-                alert("Bulk Upload Complete.");
-                loadData(false);
-            } catch (err) { alert("Import Failed: " + err.message); }
-        };
-        reader.readAsText(file);
-    }
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const rawJson = JSON.parse(e.target.result);
+            
+            // 1. Determine if the data is a single object or an array
+            let dataArray = Array.isArray(rawJson) ? rawJson : [rawJson];
+
+            // 2. CLEANING: Only keep keys that exist in your 'allFields' list
+            // This prevents the "catalog column not found" error
+            const cleanedData = dataArray.map(record => {
+                let cleanRecord = {};
+                allFields.forEach(field => {
+                    if (record[field] !== undefined) {
+                        cleanRecord[field] = record[field];
+                    }
+                });
+                return cleanRecord;
+            });
+
+            // 3. Check if we actually have data left after cleaning
+            if (Object.keys(cleanedData[0]).length === 0) {
+                throw new Error("No matching database fields found in this JSON file.");
+            }
+
+            const { error } = await _supabase.from('consultants').insert(cleanedData);
+            if (error) throw error;
+            
+            alert("Bulk Upload Complete.");
+            loadData(false);
+        } catch (err) { 
+            alert("Import Failed: " + err.message); 
+            console.error("Full Error:", err);
+        }
+    };
+    reader.readAsText(file);
+}
 
     // RECORD DELETION
     async function deleteRecord(id, name) {
