@@ -7,17 +7,28 @@
     <link rel="icon" type="image/png" href="Screenshot_2026-02-06_19.10.56-removebg-preview.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --cgc-teal: #55a393; --text: #1a1a1a; }
+        :root { 
+            --cgc-teal: #55a393; 
+            --text: #1a1a1a; 
+        }
         
         body, html { 
             margin: 0; 
             padding: 0; 
             height: 100%; 
             font-family: 'Raleway', sans-serif; 
-            background-color: #ffffff;
+            
+            /* --- FULL PAGE MOUNTAIN BACKGROUND --- */
+            /* We use a slight white tint (rgba 255,255,255,0.3) so the image isn't too dark */
+            background-image: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)), url('mountain.png');
+            background-size: cover;      /* Makes image fill the whole screen */
+            background-position: center bottom; /* Keeps the peaks at the bottom */
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Prevents image from moving on scroll */
+            
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevents scrollbars */
+            overflow: hidden; 
         }
 
         /* Top Left Logo */
@@ -26,9 +37,10 @@
             position: absolute;
             top: 0;
             left: 0;
+            z-index: 10;
         }
         .logo-img {
-            height: 60px; /* Adjust size as needed */
+            height: 60px;
         }
 
         /* Main Content Area */
@@ -38,58 +50,62 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 2;
-            padding-bottom: 10vh; /* Keeps text slightly above center */
+            z-index: 5;
+            padding: 20px;
+        }
+
+        /* Glass Effect Box for Readability */
+        .glass-box {
+            background: rgba(255, 255, 255, 0.4); 
+            backdrop-filter: blur(12px); /* This blurs the mountain behind the text */
+            -webkit-backdrop-filter: blur(12px);
+            padding: 3.5rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+            max-width: 800px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         }
 
         h1 { 
             font-family: 'Poppins'; 
             font-weight: 800; 
             font-size: 3.5rem; 
-            margin-bottom: 0.5rem; 
+            margin-bottom: 1rem; 
             letter-spacing: -2px; 
             color: var(--text); 
-            text-align: center;
+            line-height: 1.1;
         }
         .subtitle { 
-            font-size: 1.2rem; 
-            color: #555; 
-            margin-bottom: 3rem; 
-            text-align: center;
+            font-size: 1.3rem; 
+            color: #333; 
+            margin-bottom: 3.5rem; 
         }
 
         .btn { 
-            padding: 1.2rem 2.2rem; 
+            padding: 1.2rem 2.5rem; 
             font-family: 'Poppins'; 
             font-weight: 700; 
-            font-size: 0.95rem; 
+            font-size: 1rem; 
             text-decoration: none; 
             border-radius: 12px; 
-            transition: 0.3s; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             text-transform: uppercase;
             background: var(--cgc-teal); 
             color: white; 
+            display: inline-block;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-
-        /* The Mountain at the bottom */
-        .mountain-bg {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 50vh; /* Adjust height of the mountain peak */
-            background-image: url('mountain.png');
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
-            z-index: 1;
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+            background: #448a7d; /* Slightly darker teal on hover */
         }
 
-        /* Subtle Glows to keep your style */
-        .glow { position: absolute; width: 30vw; height: 30vw; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.15; }
-        .glow-1 { background: var(--cgc-teal); top: 20%; right: 10%; }
-        .glow-2 { background: #e77431; top: 40%; left: 5%; }
+        /* Glow effects for a touch of color */
+        .glow { position: absolute; width: 35vw; height: 35vw; border-radius: 50%; filter: blur(120px); z-index: 1; opacity: 0.2; }
+        .glow-1 { background: var(--cgc-teal); top: 10%; right: 5%; }
+        .glow-2 { background: #e77431; bottom: 10%; left: 5%; }
     </style>
 </head>
 <body>
@@ -101,11 +117,14 @@
     <div class="glow glow-2"></div>
 
     <div class="main-container">
-        <h1>Welcome to Common Good Company:</h1>
-        <p class="subtitle">Please sign in to access the Intelligence Register.</p>
-        <a href="login.html" class="btn">CGC Worker Login</a>
+        <div class="glass-box">
+            <h1>Welcome to Common Good Company:</h1>
+            <p class="subtitle">Please sign in to access the Intelligence Register.</p>
+            <div class="btn-container">
+                <a href="login.html" class="btn">CGC Worker Login</a>
+            </div>
+        </div>
     </div>
-
-    <div class="mountain-bg"></div>
 </body>
 </html>
+
