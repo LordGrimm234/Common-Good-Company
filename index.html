@@ -7,31 +7,105 @@
     <link rel="icon" type="image/png" href="Screenshot_2026-02-06_19.10.56-removebg-preview.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&family=Raleway:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --cgc-red: #b5302b; --cgc-orange: #e77431; --cgc-teal: #55a393; --text: #1a1a1a; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Raleway', sans-serif; background: #ffffff; display: flex; align-items: center; justify-content: center; }
-        .glow { position: absolute; width: 40vw; height: 40vw; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.1; }
-        .glow-red { background: var(--cgc-red); top: -10%; left: -10%; }
-        .glow-teal { background: var(--cgc-teal); bottom: -10%; right: -10%; }
-        .content { text-align: center; max-width: 900px; padding: 2rem; }
-        h1 { font-family: 'Poppins'; font-weight: 800; font-size: 4rem; margin-bottom: 1rem; letter-spacing: -2px; line-height: 1.1; }
-        .subtitle { font-size: 1.4rem; color: #555; margin-bottom: 4rem; }
-        .btn-container { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 1.2rem 2.2rem; font-family: 'Poppins'; font-weight: 700; font-size: 0.95rem; text-decoration: none; border-radius: 12px; transition: 0.3s; text-transform: uppercase; }
-        .btn-red { background: var(--cgc-red); color: white; }
-        .btn-teal { background: var(--cgc-teal); color: white; }
-        .btn-orange { background: var(--cgc-orange); color: white; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        :root { --cgc-teal: #55a393; --text: #1a1a1a; }
+        
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            font-family: 'Raleway', sans-serif; 
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevents scrollbars */
+        }
+
+        /* Top Left Logo */
+        header {
+            padding: 2rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .logo-img {
+            height: 60px; /* Adjust size as needed */
+        }
+
+        /* Main Content Area */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            padding-bottom: 10vh; /* Keeps text slightly above center */
+        }
+
+        h1 { 
+            font-family: 'Poppins'; 
+            font-weight: 800; 
+            font-size: 3.5rem; 
+            margin-bottom: 0.5rem; 
+            letter-spacing: -2px; 
+            color: var(--text); 
+            text-align: center;
+        }
+        .subtitle { 
+            font-size: 1.2rem; 
+            color: #555; 
+            margin-bottom: 3rem; 
+            text-align: center;
+        }
+
+        .btn { 
+            padding: 1.2rem 2.2rem; 
+            font-family: 'Poppins'; 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+            background: var(--cgc-teal); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+
+        /* The Mountain at the bottom */
+        .mountain-bg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50vh; /* Adjust height of the mountain peak */
+            background-image: url('mountain.png');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        /* Subtle Glows to keep your style */
+        .glow { position: absolute; width: 30vw; height: 30vw; border-radius: 50%; filter: blur(100px); z-index: 0; opacity: 0.15; }
+        .glow-1 { background: var(--cgc-teal); top: 20%; right: 10%; }
+        .glow-2 { background: #e77431; top: 40%; left: 5%; }
     </style>
 </head>
 <body>
-    <div class="glow glow-red"></div>
-    <div class="glow glow-teal"></div>
-    <div class="content">
+    <header>
+        <img src="cgc-logo.png" alt="CGC Logo" class="logo-img">
+    </header>
+
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="main-container">
         <h1>Welcome to Common Good Company:</h1>
         <p class="subtitle">Please sign in to access the Intelligence Register.</p>
-        <div class="btn-container">
-            <a href="login.html" class="btn btn-teal">CGC Worker</a>
-        </div>
+        <a href="login.html" class="btn">CGC Worker Login</a>
     </div>
+
+    <div class="mountain-bg"></div>
 </body>
 </html>
